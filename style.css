@@ -1,0 +1,28 @@
+body {
+    background-color: black;
+    color: white;
+}
+
+h1, p {
+    text-align: center;
+}
+
+h1 {
+    font-size: 100px;
+    margin-bottom: 0;
+}
+
+p {
+    margin-bottom: 40px;
+}
+
+#game-space {
+    width: 800px;
+    margin: 0 auto;
+}
+
+#game-canvas {
+    width: 800px;
+    height: 1000px;
+    background-color: #1e3799;
+}
