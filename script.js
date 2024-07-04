@@ -3,7 +3,7 @@ canvas.width = canvas.Width = 800;
 canvas.height = canvas.Height = 800;
 ctx = canvas.getContext("2d");
 
-class Game{
+class Game {
     constructor(x, y, width, height) {
         this.x = x;
         this.y = y;
@@ -12,7 +12,7 @@ class Game{
         this.gameOver = false
     }
 
-    init(){
+    init() {
         // Create a line of six bricks
         this.bricks = [];
         for (let i = 0; i < 6; i++) {
@@ -23,14 +23,15 @@ class Game{
         this.stick = new Stick(300, 700, 200, 20);
 
         // Draw the ball
-        this.ball = new Ball(400, 685, 15);
+        this.ball = new Ball(400, 680, 15);
 
     }
-    draw(ctx){
+
+    draw(ctx) {
         this.state = this.checkCollision()
-        if (this.state === "over"){
+        if (this.state === "over") {
             this.gameOver = true;
-        }else{
+        } else {
             this.ball.move(this.state);
         }
         // Draw the background
@@ -38,7 +39,7 @@ class Game{
         ctx.fillRect(this.x, this.y, this.width, this.height);
 
         // Draw all the bricks
-        for (let i=0; i < this.bricks.length; i++){
+        for (let i = 0; i < this.bricks.length; i++) {
             this.bricks[i].draw(ctx);
         }
 
@@ -50,33 +51,33 @@ class Game{
     }
 
     // Check collisions between ball and others objects
-    checkCollision(){
+    checkCollision() {
         // check with all the bricks
-        for (let i=0; i < this.bricks.length; i++){
-            if (this.ball.isInCollisionX(this.bricks[i])){
+        for (let i = 0; i < this.bricks.length; i++) {
+            if (this.ball.isInCollisionX(this.bricks[i])) {
                 return "x";
             }
-            if (this.ball.isInCollisionY(this.bricks[i])){
+            if (this.ball.isInCollisionY(this.bricks[i])) {
                 return "y";
             }
         }
 
         // check with the stick
-        if (this.ball.isInCollisionX(this.stick)){
+        if (this.ball.isInCollisionX(this.stick)) {
             return "x";
         }
-        if (this.ball.isInCollisionY(this.stick)){
+        if (this.ball.isInCollisionY(this.stick)) {
             return "y";
         }
 
         // check with the wall
-        if (this.ball.isRoughlyEqual(this.ball.x, this.x) || this.ball.isRoughlyEqual(this.ball.x, this.width)){
+        if (this.ball.isRoughlyEqual(this.ball.x, this.x) || this.ball.isRoughlyEqual(this.ball.x, this.width)) {
             return "x"
         }
-        if (this.ball.isRoughlyEqual(this.ball.y - this.ball.radius, this.y)){
+        if (this.ball.isRoughlyEqual(this.ball.y - this.ball.radius, this.y)) {
             return "y"
         }
-        if (this.ball.isRoughlyEqual(this.ball.y, this.height)){
+        if (this.ball.isRoughlyEqual(this.ball.y, this.height)) {
             return "y"
         }
         return ""
@@ -84,14 +85,14 @@ class Game{
 }
 
 class Brick {
-    constructor(x, y){
+    constructor(x, y) {
         this.x = x;
         this.y = y;
         this.width = 100;
         this.height = 50;
     }
 
-    draw(ctx){
+    draw(ctx) {
         ctx.fillStyle = "#4cd137";
         ctx.fillRect(this.x, this.y, this.width, this.height);
         ctx.strokeStyle = "#000";
@@ -107,7 +108,7 @@ class Stick {
         this.height = height;
     }
 
-    draw(ctx){
+    draw(ctx) {
         ctx.fillStyle = "#7f8fa6";
         ctx.fillRect(this.x, this.y, this.width, this.height);
         ctx.strokeRect(this.x, this.y, this.width, this.height);
@@ -123,7 +124,7 @@ class Ball {
         this.velocityY = -1;
     }
 
-    draw(ctx){
+    draw(ctx) {
         // Draw the ball
         ctx.fillStyle = "#FFF";
         ctx.beginPath();
@@ -131,12 +132,12 @@ class Ball {
         ctx.fill();
     }
 
-    isRoughlyEqual(fixedValue, valueToRound){
+    isRoughlyEqual(fixedValue, valueToRound) {
         let tol = 4;
         return fixedValue > valueToRound - tol && fixedValue < valueToRound + tol;
     }
 
-    isInCollisionX(obj){
+    isInCollisionY(obj) {
         // first check a hit from the top and then a hit from the bottom
         // Pattern explain: we check a range in X and a specific point in y
         // Exemple:
@@ -146,17 +147,16 @@ class Ball {
         // --------------   --> same here
         //      (^) --> from the bottom (this.x)
         // I had a roughly equal because we can't catch always when it's perfectly align.
-        return false//obj.x <= this.x <= obj.x + obj.width && (this.isRoughlyEqual(this.y + this.radius, obj.y) || this.isRoughlyEqual( this.y - this.radius, obj.y + obj.height));
+        return this.x >= obj.x && this.x <= obj.x + obj.width && (this.isRoughlyEqual(this.y + this.radius, obj.y) || this.isRoughlyEqual(this.y - this.radius, obj.y + obj.height));//obj.y + obj.height >= this.y >= obj.y && (this.isRoughlyEqual(this.x + this.radius, obj.x) || this.isRoughlyEqual(this.x - this.radius, obj.x + obj.width));
     }
 
-    isInCollisionY(obj){
-        // first check a hit from left and then a hit from right
-        // Same logic as before
-        return this.x >= obj.x && this.x <= obj.x + obj.width && ( this.isRoughlyEqual(this.y + this.radius, obj.y) || this.isRoughlyEqual(this.y - this.radius, obj.y + obj.height));//obj.y + obj.height >= this.y >= obj.y && (this.isRoughlyEqual(this.x + this.radius, obj.x) || this.isRoughlyEqual(this.x - this.radius, obj.x + obj.width));
+    isInCollisionX(obj) {
+        // Checks hits form left and right
+        return this.y >= obj.y && this.y <= obj.y + obj.height && (this.isRoughlyEqual(this.x + this.radius, obj.x) || this.isRoughlyEqual(this.x - this.radius, obj.x + obj.width));
     }
 
-    move(invertVelocity){
-        if (invertVelocity === "x"){
+    move(invertVelocity) {
+        if (invertVelocity === "x") {
             this.velocityX *= -1
         }
         if (invertVelocity === "y") {
@@ -169,8 +169,8 @@ class Ball {
 
 game = new Game(0, 0, canvas.width, canvas.height);
 game.init(ctx);
-draw = function (){
-    if (!game.gameOver){
+draw = function () {
+    if (!game.gameOver) {
         window.requestAnimationFrame(draw)
     }
     game.draw(ctx);
