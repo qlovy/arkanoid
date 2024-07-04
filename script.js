@@ -9,35 +9,77 @@ class Game{
         this.y = y;
         this.width = width;
         this.height = height;
+        this.gameOver = false
     }
 
+    init(){
+        // Create a line of six bricks
+        this.bricks = [];
+        for (let i = 0; i < 6; i++) {
+            this.bricks.push(new Brick(100 + 100 * i, 200, 100, 50));
+        }
+
+        // Create the stick
+        this.stick = new Stick(300, 700, 200, 20);
+
+        // Draw the ball
+        this.ball = new Ball(400, 685, 15);
+
+    }
     draw(ctx){
+        this.state = this.checkCollision()
+        if (this.state === "over"){
+            this.gameOver = true;
+        }else{
+            this.ball.move(this.state);
+        }
         // Draw the background
         ctx.fillStyle = "#192a56";
         ctx.fillRect(this.x, this.y, this.width, this.height);
 
-        // Draw a line of four bricks
-        let bricks = [];
-        for (let i = 0; i < 6; i++) {
-            bricks.push(new Brick(100 + 100 * i, 200, 100, 50));
-            bricks[i].draw(ctx);
+        // Draw all the bricks
+        for (let i=0; i < this.bricks.length; i++){
+            this.bricks[i].draw(ctx);
         }
 
         // Draw the stick
-        let stick = new Stick(300, 700, 200, 20);
-        stick.draw(ctx);
+        this.stick.draw(ctx);
 
         // Draw the ball
-        let ball = new Ball(400, 685, 15);
-        ball.draw(ctx);
-        // Manage the ball's collision
+        this.ball.draw(ctx);
+    }
 
-        // If the ball touches the side wall
-        if (this.x >= canvas.width - this.radius || this.x <= 0 + this.radius) {
-            this.velocityX = this.velocityX * -1;
+    // Check collisions between ball and others objects
+    checkCollision(){
+        // check with all the bricks
+        for (let i=0; i < this.bricks.length; i++){
+            if (this.ball.isInCollisionX(this.bricks[i])){
+                return "x";
+            }
+            if (this.ball.isInCollisionY(this.bricks[i])){
+                return "y";
+            }
         }
-        // If the ball touches the stick
 
+        // check with the stick
+        if (this.ball.isInCollisionX(this.stick)){
+            return "x";
+        }
+        if (this.ball.isInCollisionY(this.stick)){
+            return "y";
+        }
+
+        // check with the wall
+        if (this.ball.isRoughlyEqual(this.ball.x, this.x) || this.ball.isRoughlyEqual(this.ball.x, this.width)){
+            return "x"
+        }
+        if (this.ball.isRoughlyEqual(this.ball.y - this.ball.radius, this.y)){
+            return "y"
+        }
+        if (this.ball.isRoughlyEqual(this.ball.y, this.height)){
+            return "y"
+        }
+        return ""
     }
 }
 
@@ -52,7 +94,7 @@ class Brick {
     draw(ctx){
         ctx.fillStyle = "#4cd137";
         ctx.fillRect(this.x, this.y, this.width, this.height);
-        ctx.strokeStyle = "#000"
+        ctx.strokeStyle = "#000";
         ctx.strokeRect(this.x, this.y, this.width, this.height);
     }
 }
@@ -77,20 +119,62 @@ class Ball {
         this.x = x;
         this.y = y;
         this.radius = radius;
-        this.velocityY = 2;
-        this.velocityX = 2;
+        this.velocityX = -1;
+        this.velocityY = -1;
     }
 
     draw(ctx){
         // Draw the ball
         ctx.fillStyle = "#FFF";
-        ctx.beginPath()
+        ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
         ctx.fill();
+    }
+
+    isRoughlyEqual(fixedValue, valueToRound){
+        let tol = 4;
+        return fixedValue > valueToRound - tol && fixedValue < valueToRound + tol;
+    }
+
+    isInCollisionX(obj){
+        // first check a hit from the top and then a hit from the bottom
+        // Pattern explain: we check a range in X and a specific point in y
+        // Exemple:
+        //      (v) --> from the top (this.x)
+        // --------------   --> the coordinates (x, y) of theses pointes should match
+        // |            |
+        // --------------   --> same here
+        //      (^) --> from the bottom (this.x)
+        // I had a roughly equal because we can't catch always when it's perfectly align.
+        return false//obj.x <= this.x <= obj.x + obj.width && (this.isRoughlyEqual(this.y + this.radius, obj.y) || this.isRoughlyEqual( this.y - this.radius, obj.y + obj.height));
+    }
+
+    isInCollisionY(obj){
+        // first check a hit from left and then a hit from right
+        // Same logic as before
+        return this.x >= obj.x && this.x <= obj.x + obj.width && ( this.isRoughlyEqual(this.y + this.radius, obj.y) || this.isRoughlyEqual(this.y - this.radius, obj.y + obj.height));//obj.y + obj.height >= this.y >= obj.y && (this.isRoughlyEqual(this.x + this.radius, obj.x) || this.isRoughlyEqual(this.x - this.radius, obj.x + obj.width));
+    }
+
+    move(invertVelocity){
+        if (invertVelocity === "x"){
+            this.velocityX *= -1
+        }
+        if (invertVelocity === "y") {
+            this.velocityY *= -1
+        }
+        this.x += this.velocityX;
+        this.y += this.velocityY;
     }
 }
 
 game = new Game(0, 0, canvas.width, canvas.height);
-game.draw(ctx);
+game.init(ctx);
+draw = function (){
+    if (!game.gameOver){
+        window.requestAnimationFrame(draw)
+    }
+    game.draw(ctx);
+}
+draw();
 
 
