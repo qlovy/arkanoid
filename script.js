@@ -1,7 +1,24 @@
-canvas = document.getElementById("game-canvas");
+// Link between the variable and the html tags
+const canvas = document.getElementById("game-canvas");
 canvas.width = canvas.Width = 800;
 canvas.height = canvas.Height = 800;
 ctx = canvas.getContext("2d");
+
+// Link to the body tag
+const watchKey = document.querySelector("body");
+// Catch all the keyDown event
+watchKey.addEventListener("keydown", logKey);
+// Catch all the keyUp event
+watchKey.addEventListener("keyup", (e) => {
+    keyDown = 0;    // Reset when the key is up
+});
+
+let keyDown;
+
+function logKey(e){
+    // Update the last key pressed down
+    keyDown = e.key;
+}
 
 class Game {
     constructor(x, y, width, height) {
@@ -28,10 +45,13 @@ class Game {
     }
 
     draw(ctx) {
+        // Update the state of the mouvement of the ball
         this.state = this.checkCollision()
+        // If the game is going to be over
         if (this.state === "over") {
             this.gameOver = true;
         } else {
+            // Apply the state to the movement of the ball
             this.ball.move(this.state);
         }
         // Draw the background
@@ -48,6 +68,8 @@ class Game {
 
         // Draw the ball
         this.ball.draw(ctx);
+
+        this.stick.move();
     }
 
     // Check collisions between ball and others objects
@@ -113,6 +135,18 @@ class Stick {
         ctx.fillRect(this.x, this.y, this.width, this.height);
         ctx.strokeRect(this.x, this.y, this.width, this.height);
     }
+
+    move() {
+        // If the key "a" or the left arrow are pressed down and the stick isn't going to exit the display
+        if ((keyDown === "a" || keyDown === "ArrowLeft") && this.x >= 0){
+            // Move to the left
+            this.x = this.x - 5;
+        // If the key "d" or the right arrow are pressed down and the stick isn't going to exit the display
+        }else if((keyDown === "d" || keyDown === "ArrowRight") && this.x <= canvas.width - this.width){
+            // Move to the right
+            this.x = this.x + 5;
+        }
+    }
 }
 
 class Ball {
@@ -120,8 +154,8 @@ class Ball {
         this.x = x;
         this.y = y;
         this.radius = radius;
-        this.velocityX = -1;
-        this.velocityY = -1;
+        this.velocityX = -2;
+        this.velocityY = -2;
     }
 
     draw(ctx) {
