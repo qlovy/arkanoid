@@ -26,7 +26,8 @@ class Game {
         this.y = y;
         this.width = width;
         this.height = height;
-        this.gameOver = false
+        this.gameOver = false;
+        this.gameWin = false;
     }
 
     init() {
@@ -50,10 +51,13 @@ class Game {
         // If the game is going to be over
         if (this.state === "over") {
             this.gameOver = true;
+        }else if (this.bricks.length === 0){
+            this.gameWin = true;
         } else {
             // Apply the state to the movement of the ball
             this.ball.move(this.state);
         }
+
         // Draw the background
         ctx.fillStyle = "#192a56";
         ctx.fillRect(this.x, this.y, this.width, this.height);
@@ -76,15 +80,19 @@ class Game {
     checkCollision() {
         // check with all the bricks
         for (let i = 0; i < this.bricks.length; i++) {
+            // Check collision in x and y between the ball and the bricks
             if (this.ball.isInCollisionX(this.bricks[i])) {
+                this.bricks.splice(i, 1);   // Remove the brick who has been touched by the ball
                 return "x";
             }
             if (this.ball.isInCollisionY(this.bricks[i])) {
+                this.bricks.splice(i, 1);
                 return "y";
             }
         }
 
         // check with the stick
+        // Check x and y 
         if (this.ball.isInCollisionX(this.stick)) {
             return "x";
         }
@@ -93,16 +101,38 @@ class Game {
         }
 
         // check with the wall
-        if (this.ball.isRoughlyEqual(this.ball.x, this.x) || this.ball.isRoughlyEqual(this.ball.x, this.width)) {
+        // If the ball touched the side wall
+        if (this.ball.isRoughlyEqual(this.ball.x - this.ball.radius, this.x) || this.ball.isRoughlyEqual(this.ball.x + this.ball.radius, this.width)) {
             return "x"
         }
+        // If the ball touched the top wall
         if (this.ball.isRoughlyEqual(this.ball.y - this.ball.radius, this.y)) {
             return "y"
         }
-        if (this.ball.isRoughlyEqual(this.ball.y, this.height)) {
-            return "y"
+        // If the ball touched the bottom wall
+        if (this.ball.isRoughlyEqual(this.ball.y + this.ball.radius, this.height)) {
+            return "over"
         }
         return ""
+    }
+
+    displayWin(ctx){
+        // Background color who move from black to white while drawing rectangle
+        let thickness = 10;
+        let up = 5;
+        for (let i=0; i<40; i++){
+            // The new rgb nalue
+            let rgbValue = 0 + up * i;
+            // Evolution of the color in function of i 
+            ctx.fillStyle = "rgb(" + rgbValue + "," + rgbValue + ", "+  rgbValue + ")";
+            // Move the rectangle in function of i, they are align in the center of the canvas
+            ctx.fillRect(this.x + thickness * i, this.y + thickness * i, this.width - 2* thickness * i, this.height - 2 * thickness * i);
+        }
+
+        // The text
+        ctx.fillStyle = "#FFF";
+        ctx.font = "100px serif";
+        ctx.fillText("Well done !", this.width/2 - 200, this.height/2 + 50);
     }
 }
 
@@ -154,8 +184,8 @@ class Ball {
         this.x = x;
         this.y = y;
         this.radius = radius;
-        this.velocityX = -2;
-        this.velocityY = -2;
+        this.velocityX = -6;
+        this.velocityY = -6;
     }
 
     draw(ctx) {
@@ -201,13 +231,19 @@ class Ball {
     }
 }
 
-game = new Game(0, 0, canvas.width, canvas.height);
-game.init(ctx);
+arakanoid = new Game(0, 0, canvas.width, canvas.height);
+arakanoid.init(ctx);
 draw = function () {
-    if (!game.gameOver) {
+    if (!arakanoid.gameOver && !arakanoid.gameWin) {
         window.requestAnimationFrame(draw)
     }
-    game.draw(ctx);
+    if (arakanoid.gameWin){
+        arakanoid.displayWin(ctx);
+    }else if (arakanoid.gameOver){
+        ;
+    }else{
+        arakanoid.draw(ctx);
+    }
 }
 draw();
 
