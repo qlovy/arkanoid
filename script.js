@@ -7,15 +7,17 @@ ctx = canvas.getContext("2d");
 // Link to the body tag
 const watchKey = document.querySelector("body");
 // Catch all the keyDown event
-watchKey.addEventListener("keydown", logKey);
+watchKey.addEventListener("keydown", getKey);
 
 // Catch all the keyUp event
 watchKey.addEventListener("keyup", (e) => {
     keyDown = 0;    // Reset when the key is up
 });
-
+// Catch all the mouseup event
 watchKey.addEventListener("mouseup", (e) => {
-    if (e.button === 0){
+    // If the right button is pressed
+    if (e.button === 0) {
+        // Start the game
         arkanoid.gameStop = false;
         draw();
     }
@@ -23,7 +25,7 @@ watchKey.addEventListener("mouseup", (e) => {
 
 let keyDown;
 
-function logKey(e){
+function getKey(e) {
     // Update the last key pressed down
     keyDown = e.key;
 }
@@ -57,7 +59,7 @@ class Game {
 
     }
 
-    draw(ctx){
+    draw(ctx) {
         // Draw the background
         ctx.fillStyle = "#192a56";
         ctx.fillRect(this.x, this.y, this.width, this.height);
@@ -74,13 +76,13 @@ class Game {
         this.ball.draw(ctx);
 
         // If the game is stopped
-        if(this.gameStop){
+        if (this.gameStop) {
             // Make a transparency rectangle
             ctx.fillStyle = "rgb(0 0 0 / 30%)";
             ctx.fillRect(this.x, this.y, this.width, this.height);
             ctx.fillStyle = "white";
             ctx.font = "40px sans-serif"
-            ctx.fillText("Click here to start", this.width/2 - 160, this.height/2);
+            ctx.fillText("Click here to start", this.width / 2 - 160, this.height / 2);
         }
     }
 
@@ -91,7 +93,7 @@ class Game {
         // If the game is going to be over
         if (this.state === "over") {
             this.gameOver = true;
-        }else if (this.bricks.length === 0){
+        } else if (this.bricks.length === 0) {
             this.gameWin = true;
         } else {
             // Apply the state to the movement of the ball
@@ -144,27 +146,27 @@ class Game {
         return ""
     }
 
-    displayWin(ctx){
+    displayWin(ctx) {
         // The backgound is black
         ctx.fillStyle = "#000";
         ctx.fillRect(this.x, this.y, this.width, this.height);
-        
+
         // The image
         let img = new Image();
         img.src = "src/hannibalSmith.jpg";
-        img.onload = function(){
+        img.onload = function () {
             // drawImage(img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
             // s is for cutting the image and d is for placing the image in the canvas
-            ctx.drawImage(img, 10, 0, 243, 191, this.width/2 + 10, this.height/2 - 50, 263 * 2, 191 * 2);
+            ctx.drawImage(img, 10, 0, 243, 191, this.width / 2 + 10, this.height / 2 - 50, 263 * 2, 191 * 2);
         }
 
         // The text
         ctx.fillStyle = "#FFF";
         ctx.font = "70px serif";
-        ctx.fillText("Well done !", this.width/2 - 150, this.height/2 + 150);
+        ctx.fillText("Well done !", this.width / 2 - 150, this.height / 2 + 150);
     }
 
-    displayGameOver(ctx){
+    displayGameOver(ctx) {
         // Generate randomly the y value
         let y = Math.floor(Math.random() * (this.height - 500));
         // The black background
@@ -172,12 +174,12 @@ class Game {
         ctx.fillRect(this.x, this.y, this.width, this.height);
 
         // The placement in x for everyone
-        let x = this.width/2 - 300;
+        let x = this.width / 2 - 300;
 
         // The two rectangles one stroke with red
         ctx.strokeStyle = "red";
         ctx.strokeRect(x, y, 600, 200);
-        
+
         // The text write in white with shadow in red
         ctx.fillStyle = "white";
         ctx.font = "100px sans-serif";
@@ -219,11 +221,11 @@ class Stick {
 
     move() {
         // If the key "a" or the left arrow are pressed down and the stick isn't going to exit the display
-        if ((keyDown === "a" || keyDown === "ArrowLeft") && this.x >= 0){
+        if ((keyDown === "a" || keyDown === "ArrowLeft") && this.x >= 0) {
             // Move to the left
             this.x = this.x - 5;
-        // If the key "d" or the right arrow are pressed down and the stick isn't going to exit the display
-        }else if((keyDown === "d" || keyDown === "ArrowRight") && this.x <= canvas.width - this.width){
+            // If the key "d" or the right arrow are pressed down and the stick isn't going to exit the display
+        } else if ((keyDown === "d" || keyDown === "ArrowRight") && this.x <= canvas.width - this.width) {
             // Move to the right
             this.x = this.x + 5;
         }
@@ -237,6 +239,12 @@ class Ball {
         this.radius = radius;
         this.velocityX = -6;
         this.velocityY = -6;
+        // If the window is bigger than 1920x180
+        if (window.innerWidth > 1920) {
+            // Reduce the ball speed
+            this.velocityX = -3;
+            this.velocityY = -3;
+        }
     }
 
     draw(ctx) {
@@ -292,9 +300,9 @@ draw = function () {
         window.requestAnimationFrame(draw)
     }
     // Si le jeu est fini
-    if (arkanoid.gameWin){
+    if (arkanoid.gameWin) {
         arkanoid.displayWin(ctx);
-    }else if (arkanoid.gameOver){
+    } else if (arkanoid.gameOver) {
         arkanoid.displayGameOver(ctx);
     }
 }
