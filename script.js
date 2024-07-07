@@ -8,10 +8,18 @@ ctx = canvas.getContext("2d");
 const watchKey = document.querySelector("body");
 // Catch all the keyDown event
 watchKey.addEventListener("keydown", logKey);
+
 // Catch all the keyUp event
 watchKey.addEventListener("keyup", (e) => {
     keyDown = 0;    // Reset when the key is up
 });
+
+watchKey.addEventListener("mouseup", (e) => {
+    if (e.button === 0){
+        arkanoid.gameStop = false;
+        draw();
+    }
+})
 
 let keyDown;
 
@@ -28,6 +36,7 @@ class Game {
         this.height = height;
         this.gameOver = false;
         this.gameWin = false;
+        this.gameStop = true;
     }
 
     init() {
@@ -43,22 +52,12 @@ class Game {
         // Draw the ball
         this.ball = new Ball(400, 680, 15);
 
+        // Lock screen before the game begin
+
+
     }
 
-    draw(ctx) {
-        // Update the state of the mouvement of the ball
-        this.state = this.checkCollision()
-
-        // If the game is going to be over
-        if (this.state === "over") {
-            this.gameOver = true;
-        }else if (this.bricks.length === 0){
-            this.gameWin = true;
-        } else {
-            // Apply the state to the movement of the ball
-            this.ball.move(this.state);
-        }
-
+    draw(ctx){
         // Draw the background
         ctx.fillStyle = "#192a56";
         ctx.fillRect(this.x, this.y, this.width, this.height);
@@ -73,6 +72,33 @@ class Game {
 
         // Draw the ball
         this.ball.draw(ctx);
+
+        // If the game is stopped
+        if(this.gameStop){
+            // Make a transparency rectangle
+            ctx.fillStyle = "rgb(0 0 0 / 30%)";
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+            ctx.fillStyle = "white";
+            ctx.font = "40px sans-serif"
+            ctx.fillText("Click here to start", this.width/2 - 160, this.height/2);
+        }
+    }
+
+    play(ctx) {
+        // Update the state of the mouvement of the ball
+        this.state = this.checkCollision()
+
+        // If the game is going to be over
+        if (this.state === "over") {
+            this.gameOver = true;
+        }else if (this.bricks.length === 0){
+            this.gameWin = true;
+        } else {
+            // Apply the state to the movement of the ball
+            this.ball.move(this.state);
+        }
+
+        this.draw(ctx);
 
         // Move the stick in function of the key press
         this.stick.move();
@@ -119,22 +145,23 @@ class Game {
     }
 
     displayWin(ctx){
-        // Background color who move from black to white while drawing rectangle
-        let thickness = 10;
-        let up = 5;
-        for (let i=0; i<40; i++){
-            // The new rgb nalue
-            let rgbValue = 0 + up * i;
-            // Evolution of the color in function of i 
-            ctx.fillStyle = "rgb(" + rgbValue + "," + rgbValue + ", "+  rgbValue + ")";
-            // Move the rectangle in function of i, they are align in the center of the canvas
-            ctx.fillRect(this.x + thickness * i, this.y + thickness * i, this.width - 2* thickness * i, this.height - 2 * thickness * i);
+        // The backgound is black
+        ctx.fillStyle = "#000";
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+        
+        // The image
+        let img = new Image();
+        img.src = "src/hannibalSmith.jpg";
+        img.onload = function(){
+            // drawImage(img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
+            // s is for cutting the image and d is for placing the image in the canvas
+            ctx.drawImage(img, 10, 0, 243, 191, this.width/2 + 10, this.height/2 - 50, 263 * 2, 191 * 2);
         }
 
         // The text
         ctx.fillStyle = "#FFF";
-        ctx.font = "100px serif";
-        ctx.fillText("Well done !", this.width/2 - 200, this.height/2 + 50);
+        ctx.font = "70px serif";
+        ctx.fillText("Well done !", this.width/2 - 150, this.height/2 + 150);
     }
 
     displayGameOver(ctx){
@@ -255,21 +282,19 @@ class Ball {
     }
 }
 
-arakanoid = new Game(0, 0, canvas.width, canvas.height);
-arakanoid.init(ctx);
+arkanoid = new Game(0, 0, canvas.width, canvas.height);
+arkanoid.init(ctx);
+arkanoid.draw(ctx);
 draw = function () {
-    arakanoid.draw(ctx);
+    arkanoid.play(ctx);
     // Si le jeu n'est pas fini
-    if (!arakanoid.gameOver && !arakanoid.gameWin) {
+    if (!arkanoid.gameOver && !arkanoid.gameWin) {
         window.requestAnimationFrame(draw)
     }
     // Si le jeu est fini
-    if (arakanoid.gameWin){
-        arakanoid.displayWin(ctx);
-    }else if (arakanoid.gameOver){
-        arakanoid.displayGameOver(ctx);
+    if (arkanoid.gameWin){
+        arkanoid.displayWin(ctx);
+    }else if (arkanoid.gameOver){
+        arkanoid.displayGameOver(ctx);
     }
 }
-draw();
-
-
