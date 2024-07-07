@@ -21,3 +21,9 @@ p {
     width: 800px;
     margin: 0 auto;
 }
+
+#game-controls{
+    margin-top: 50px;
+    text-align: center;
+    font-size: 30px;
+}

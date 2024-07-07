@@ -10,11 +10,15 @@ const watchKey = document.querySelector("body");
 watchKey.addEventListener("keydown", getKey);
 
 // Catch all the keyUp event
-watchKey.addEventListener("keyup", (e) => {
+watchKey.addEventListener("keyup", () => {
     keyDown = 0;    // Reset when the key is up
 });
+
+const canvasArea = document.querySelector("canvas");
+
+
 // Catch all the mouseup event
-watchKey.addEventListener("mouseup", (e) => {
+canvasArea.addEventListener("mouseup", (e) => {
     // If the right button is pressed
     if (e.button === 0) {
         // Start the game
@@ -28,6 +32,18 @@ let keyDown;
 function getKey(e) {
     // Update the last key pressed down
     keyDown = e.key;
+    if (e.key === "r") {
+        // Reset to the start of the game
+        arkanoid.gameOver = false;
+        arkanoid.gameStop = true;
+        arkanoid.init(ctx);
+        arkanoid.draw(ctx);
+    }
+    if (e.key === "Enter") {
+        // Start the game
+        arkanoid.gameStop = false;
+        draw();
+    }
 }
 
 class Game {
@@ -52,7 +68,7 @@ class Game {
         this.stick = new Stick(300, 700, 200, 20);
 
         // Draw the ball
-        this.ball = new Ball(400, 680, 15);
+        this.ball = new Ball(400, 685, 10);
 
         // Lock screen before the game begin
 
@@ -81,8 +97,8 @@ class Game {
             ctx.fillStyle = "rgb(0 0 0 / 30%)";
             ctx.fillRect(this.x, this.y, this.width, this.height);
             ctx.fillStyle = "white";
-            ctx.font = "40px sans-serif"
-            ctx.fillText("Click here to start", this.width / 2 - 160, this.height / 2);
+            ctx.font = "30px sans-serif"
+            ctx.fillText("Right-click here or Enter to start", this.width / 2 - 200, this.height / 2);
         }
     }
 
@@ -169,6 +185,7 @@ class Game {
     displayGameOver(ctx) {
         // Generate randomly the y value
         let y = Math.floor(Math.random() * (this.height - 500));
+
         // The black background
         ctx.fillStyle = "black";
         ctx.fillRect(this.x, this.y, this.width, this.height);
@@ -186,6 +203,10 @@ class Game {
         ctx.lineWidth = 2;
         ctx.strokeText("GameOver", x + 50 - 5, y + 125);
         ctx.fillText("GameOver", x + 50, y + 125);
+
+        // text to restart the game
+        ctx.font = "20px sans-serif";
+        ctx.fillText("Press R to restart", 100, this.height - 50);
     }
 }
 
@@ -242,8 +263,8 @@ class Ball {
         // If the window is bigger than 1920x180
         if (window.innerWidth > 1920) {
             // Reduce the ball speed
-            this.velocityX = -3;
-            this.velocityY = -3;
+            this.velocityX = -2;
+            this.velocityY = -2;
         }
     }
 
