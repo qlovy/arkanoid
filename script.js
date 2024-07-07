@@ -48,6 +48,7 @@ class Game {
     draw(ctx) {
         // Update the state of the mouvement of the ball
         this.state = this.checkCollision()
+
         // If the game is going to be over
         if (this.state === "over") {
             this.gameOver = true;
@@ -73,6 +74,7 @@ class Game {
         // Draw the ball
         this.ball.draw(ctx);
 
+        // Move the stick in function of the key press
         this.stick.move();
     }
 
@@ -133,6 +135,28 @@ class Game {
         ctx.fillStyle = "#FFF";
         ctx.font = "100px serif";
         ctx.fillText("Well done !", this.width/2 - 200, this.height/2 + 50);
+    }
+
+    displayGameOver(ctx){
+        // Generate randomly the y value
+        let y = Math.floor(Math.random() * (this.height - 500));
+        // The black background
+        ctx.fillStyle = "black";
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+
+        // The placement in x for everyone
+        let x = this.width/2 - 300;
+
+        // The two rectangles one stroke with red
+        ctx.strokeStyle = "red";
+        ctx.strokeRect(x, y, 600, 200);
+        
+        // The text write in white with shadow in red
+        ctx.fillStyle = "white";
+        ctx.font = "100px sans-serif";
+        ctx.lineWidth = 2;
+        ctx.strokeText("GameOver", x + 50 - 5, y + 125);
+        ctx.fillText("GameOver", x + 50, y + 125);
     }
 }
 
@@ -234,15 +258,16 @@ class Ball {
 arakanoid = new Game(0, 0, canvas.width, canvas.height);
 arakanoid.init(ctx);
 draw = function () {
+    arakanoid.draw(ctx);
+    // Si le jeu n'est pas fini
     if (!arakanoid.gameOver && !arakanoid.gameWin) {
         window.requestAnimationFrame(draw)
     }
+    // Si le jeu est fini
     if (arakanoid.gameWin){
         arakanoid.displayWin(ctx);
     }else if (arakanoid.gameOver){
-        ;
-    }else{
-        arakanoid.draw(ctx);
+        arakanoid.displayGameOver(ctx);
     }
 }
 draw();
