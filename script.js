@@ -61,12 +61,14 @@ class Game {
     init() {
         // Create a line of six bricks
         this.bricks = [];
-        for (let i = 0; i < 6; i++) {
-            this.bricks.push(new Brick(100 + 100 * i, 200, 100, 50));
+        for (let j = 0; j < 2; j++) {
+            for (let i = 0; i < 6; i++) {
+                this.bricks.push(new Brick(100 + 100 * i, 200 + j * 50, 100, 50));
+            }
         }
 
         // Create the stick
-        this.stick = new Stick(300, 700, 200, 20);
+        this.stick = new Stick(300, 700, 200, 20, 10);
 
         // Draw the ball
         this.ball = new Ball(400, 685, 10);
@@ -232,11 +234,12 @@ class Brick {
 }
 
 class Stick {
-    constructor(x, y, width, height) {
+    constructor(x, y, width, height, speed) {
         this.x = x;
         this.y = y;
         this.width = width;
         this.height = height;
+        this.speed = speed;
     }
 
     draw(ctx) {
@@ -249,11 +252,11 @@ class Stick {
         // If the key "a" or the left arrow are pressed down and the stick isn't going to exit the display
         if ((keyDown === "a" || keyDown === "ArrowLeft") && this.x >= 0) {
             // Move to the left
-            this.x = this.x - 5;
+            this.x = this.x - this.speed;
             // If the key "d" or the right arrow are pressed down and the stick isn't going to exit the display
         } else if ((keyDown === "d" || keyDown === "ArrowRight") && this.x <= canvas.width - this.width) {
             // Move to the right
-            this.x = this.x + 5;
+            this.x = this.x + this.speed;
         }
     }
 }
