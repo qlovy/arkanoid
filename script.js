@@ -258,7 +258,7 @@ class Ball {
         this.x = x;
         this.y = y;
         this.radius = radius;
-        this.velocityX = Math.floor(Math.random() * (6 + 6) - 6);
+        this.velocityX = Math.floor(Math.random() * (6 + 6) - 6);   // Generate a number between -6 inclusive and 6 exculsive
         this.velocityY = -6;
         // If the window is bigger than 1920x180
         if (window.innerWidth > 1920) {
