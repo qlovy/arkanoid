@@ -35,6 +35,7 @@ function getKey(e) {
     if (e.key === "r") {
         // Reset to the start of the game
         arkanoid.gameOver = false;
+        arkanoid.gameWin = false;
         arkanoid.gameStop = true;
         arkanoid.init(ctx);
         arkanoid.draw(ctx);
@@ -180,6 +181,10 @@ class Game {
         ctx.fillStyle = "#FFF";
         ctx.font = "70px serif";
         ctx.fillText("Well done !", this.width / 2 - 150, this.height / 2 + 150);
+
+        // text to restart the game
+        ctx.font = "20px sans-serif";
+        ctx.fillText("Press R to restart", 100, this.height - 50);
     }
 
     displayGameOver(ctx) {
