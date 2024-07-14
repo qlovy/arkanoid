@@ -33,12 +33,7 @@ function getKey(e) {
     // Update the last key pressed down
     keyDown = e.key;
     if (e.key === "r") {
-        // Reset to the start of the game
-        arkanoid.gameOver = false;
-        arkanoid.gameWin = false;
-        arkanoid.gameStop = true;
-        arkanoid.init(ctx);
-        arkanoid.draw(ctx);
+        arkanoid.restart(ctx);
     }
     if (e.key === "Enter") {
         // Start the game
@@ -56,15 +51,19 @@ class Game {
         this.gameOver = false;
         this.gameWin = false;
         this.gameStop = true;
+        this.currentLevel = 1;
+        this.maxLevel = 3;
+        this.changeLevel = false;
     }
 
     init() {
-        // Create a line of six bricks
-        this.bricks = [];
-        for (let j = 0; j < 2; j++) {
-            for (let i = 0; i < 6; i++) {
-                this.bricks.push(new Brick(100 + 100 * i, 200 + j * 50, 100, 50));
-            }
+        // Change the bricks position depending on the level
+        if (this.currentLevel === 1){
+            this.level1();
+        }else if (this.currentLevel === 2){
+            this.level2();
+        }else if (this.currentLevel === 3){
+            this.level3();
         }
 
         // Create the stick
@@ -72,10 +71,55 @@ class Game {
 
         // Draw the ball
         this.ball = new Ball(400, 685, 10);
+    }
 
-        // Lock screen before the game begin
+    level1() {
+        // Create a line of six bricks
+        this.bricks = [];
+        for (let i = 0; i < 6; i++) {
+            this.bricks.push(new Brick(100 + 100 * i, 200, 100, 50));
+        }
+    }
 
+    level2(){
+        // Create two lines of six bricks
+        this.bricks = [];
+        for (let i = 0; i < 2; i++){
+            for (let j = 0; j < 6; j++){
+                this.bricks.push(new Brick(100 + 100 * j, 200 + i * 50, 100, 50))
+            }
+        }
+    }
 
+    level3(){
+        // Create a checkerboard on three lines
+        this.bricks = [];
+        for (let i = 0; i < 3; i++){
+            for (let j = 0; j < 6; j++){
+                if (j % 2 === 0 && i % 2 === 0){
+                    this.bricks.push(new Brick(100 + 100 * j, 200 + i * 50, 100, 50))
+                }else if (j % 2 === 1 && i % 2 === 1){
+                    this.bricks.push(new Brick(100 + 100 * j, 200 + i * 50, 100, 50))
+                }
+            }
+        }
+    }
+
+    changeOfLevel(ctx){
+        // Increment the current level
+        this.currentLevel++;
+
+        // Draw the background
+        ctx.fillStyle = "#192a56";
+        ctx.fillRect(this.x, this.y, this.width, this.height);
+
+        // Show the new current level number
+        ctx.fillStyle = "white";
+        ctx.font = "bold 50px sans-serif";
+        ctx.fillText("Now Level " + this.currentLevel + " !", this.width/2 - 150, this.height/2);
+
+        // Initalise the new level
+        this.init();
     }
 
     draw(ctx) {
@@ -93,6 +137,11 @@ class Game {
 
         // Draw the ball
         this.ball.draw(ctx);
+
+        // Draw the number of level
+        ctx.fillStyle = "white";
+        ctx.font = "italic 20px sans-serif";
+        ctx.fillText("Level " + this.currentLevel, this.width/2 - 30, this.height -  30);
 
         // If the game is stopped
         if (this.gameStop) {
@@ -112,14 +161,23 @@ class Game {
         // If the game is going to be over
         if (this.state === "over") {
             this.gameOver = true;
+        // If all the bricks are been removed
         } else if (this.bricks.length === 0) {
-            this.gameWin = true;
+            // If this the end of the game, all the level have been done
+            if (this.currentLevel === this.maxLevel){
+                this.gameWin = true;
+            }else{
+                // Display the changement of level
+                this.changeOfLevel(ctx);
+                // Ask for a changement of level
+                this.changeLevel = true;
+            }
         } else {
             // Apply the state to the movement of the ball
             this.ball.move(this.state);
+            // Draw everything
+            this.draw(ctx);
         }
-
-        this.draw(ctx);
 
         // Move the stick in function of the key press
         this.stick.move();
@@ -214,6 +272,15 @@ class Game {
         // text to restart the game
         ctx.font = "20px sans-serif";
         ctx.fillText("Press R to restart", 100, this.height - 50);
+    }
+
+    restart(ctx){
+        // Reset to the start of the game
+        this.gameOver = this.gameWin = false;
+        this.gameStop = true;
+        this.currentLevel = 1;
+        this.init(ctx);
+        this.draw(ctx);
     }
 }
 
@@ -323,13 +390,24 @@ class Ball {
 arkanoid = new Game(0, 0, canvas.width, canvas.height);
 arkanoid.init(ctx);
 arkanoid.draw(ctx);
+
 draw = function () {
-    arkanoid.play(ctx);
-    // Si le jeu n'est pas fini
-    if (!arkanoid.gameOver && !arkanoid.gameWin) {
+    // If the game is not over
+    if (!arkanoid.gameOver && !arkanoid.gameWin && !arkanoid.changeLevel) {
         window.requestAnimationFrame(draw)
     }
-    // Si le jeu est fini
+    // If no change of level are required
+    if (!arkanoid.changeLevel){
+        arkanoid.play(ctx);
+    }else{
+        // Will execute the function after 2 seconds
+        setTimeout(() => {
+            arkanoid.changeLevel = false;
+            draw();
+        }, 2000);
+    }
+    
+    // If the game is over (win or loose)
     if (arkanoid.gameWin) {
         arkanoid.displayWin(ctx);
     } else if (arkanoid.gameOver) {
