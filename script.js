@@ -229,6 +229,7 @@ class Brick {
         ctx.fillStyle = "#4cd137";
         ctx.fillRect(this.x, this.y, this.width, this.height);
         ctx.strokeStyle = "#000";
+        ctx.lineWidth = 2;
         ctx.strokeRect(this.x, this.y, this.width, this.height);
     }
 }
