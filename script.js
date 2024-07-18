@@ -14,11 +14,8 @@ watchKey.addEventListener("keyup", () => {
     keyDown = 0;    // Reset when the key is up
 });
 
-const canvasArea = document.querySelector("canvas");
-
-
 // Catch all the mouseup event
-canvasArea.addEventListener("mouseup", (e) => {
+canvas.addEventListener("mouseup", (e) => {
     // If the right button is pressed
     if (e.button === 0) {
         // Start the game
@@ -40,6 +37,11 @@ function getKey(e) {
         arkanoid.gameStop = false;
         draw();
     }
+}
+
+function isRoughlyEqual(fixedValue, valueToRound) {
+    let tol = 4;
+    return fixedValue > valueToRound - tol && fixedValue < valueToRound + tol;
 }
 
 class Game {
@@ -209,23 +211,22 @@ class Game {
 
         // check with the wall
         // If the ball touched the side wall
-        if (this.ball.isRoughlyEqual(this.ball.x - this.ball.radius, this.x) || this.ball.isRoughlyEqual(this.ball.x + this.ball.radius, this.width)) {
+        if (isRoughlyEqual(this.ball.x - this.ball.radius, this.x) || isRoughlyEqual(this.ball.x + this.ball.radius, this.width)) {
             return "x"
         }
         // If the ball touched the top wall
-        if (this.ball.isRoughlyEqual(this.ball.y - this.ball.radius, this.y)) {
+        if (isRoughlyEqual(this.ball.y - this.ball.radius, this.y)) {
             return "y"
         }
         // If the ball touched the bottom wall
-        if (this.ball.isRoughlyEqual(this.ball.y + this.ball.radius, this.height)) {
+        if (isRoughlyEqual(this.ball.y + this.ball.radius, this.height)) {
             return "over"
         }
         return ""
     }
 
     displayWin(ctx) {
-        // The backgound is black
-        ctx.fillStyle = "#000";
+        ctx.fillStyle = "black";
         ctx.fillRect(this.x, this.y, this.width, this.height);
 
         // The image
@@ -238,7 +239,7 @@ class Game {
         }
 
         // The text
-        ctx.fillStyle = "#FFF";
+        ctx.fillStyle = "white";
         ctx.font = "70px serif";
         ctx.fillText("Well done !", this.width / 2 - 150, this.height / 2 + 150);
 
@@ -295,7 +296,7 @@ class Brick {
     draw(ctx) {
         ctx.fillStyle = "#4cd137";
         ctx.fillRect(this.x, this.y, this.width, this.height);
-        ctx.strokeStyle = "#000";
+        ctx.strokeStyle = "black";
         ctx.lineWidth = 2;
         ctx.strokeRect(this.x, this.y, this.width, this.height);
     }
@@ -342,19 +343,19 @@ class Ball {
             this.velocityX = -2;
             this.velocityY = -2;
         }
+        // While the ball is too slow
+        while (this.velocityX <= 0.9 && this.velocityY >= -0.9){
+            // Generate a new number
+            this.velocityX = Math.floor(Math.random() * (6 + 6) - 6);
+        }
     }
 
     draw(ctx) {
         // Draw the ball
-        ctx.fillStyle = "#FFF";
+        ctx.fillStyle = "white";
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
         ctx.fill();
-    }
-
-    isRoughlyEqual(fixedValue, valueToRound) {
-        let tol = 4;
-        return fixedValue > valueToRound - tol && fixedValue < valueToRound + tol;
     }
 
     isInCollisionY(obj) {
@@ -367,12 +368,12 @@ class Ball {
         // --------------   --> same here
         //      (^) --> from the bottom (this.x)
         // I had a roughly equal because we can't catch always when it's perfectly align.
-        return this.x - this.radius >= obj.x && this.x +  this.radius <= obj.x + obj.width && (this.isRoughlyEqual(this.y + this.radius, obj.y) || this.isRoughlyEqual(this.y - this.radius, obj.y + obj.height));//obj.y + obj.height >= this.y >= obj.y && (this.isRoughlyEqual(this.x + this.radius, obj.x) || this.isRoughlyEqual(this.x - this.radius, obj.x + obj.width));
+        return this.x >= obj.x && this.x <= obj.x + obj.width && (isRoughlyEqual(this.y + this.radius, obj.y) || isRoughlyEqual(this.y - this.radius, obj.y + obj.height));
     }
 
     isInCollisionX(obj) {
         // Checks hits form left and right
-        return this.y - this.radius >= obj.y && this.y + this.radius <= obj.y + obj.height && (this.isRoughlyEqual(this.x + this.radius, obj.x) || this.isRoughlyEqual(this.x - this.radius, obj.x + obj.width));
+        return this.y >= obj.y && this.y <= obj.y + obj.height && (isRoughlyEqual(this.x + this.radius, obj.x) || isRoughlyEqual(this.x - this.radius, obj.x + obj.width));
     }
 
     move(invertVelocity) {
