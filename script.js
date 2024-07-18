@@ -367,12 +367,12 @@ class Ball {
         // --------------   --> same here
         //      (^) --> from the bottom (this.x)
         // I had a roughly equal because we can't catch always when it's perfectly align.
-        return this.x >= obj.x && this.x <= obj.x + obj.width && (this.isRoughlyEqual(this.y + this.radius, obj.y) || this.isRoughlyEqual(this.y - this.radius, obj.y + obj.height));//obj.y + obj.height >= this.y >= obj.y && (this.isRoughlyEqual(this.x + this.radius, obj.x) || this.isRoughlyEqual(this.x - this.radius, obj.x + obj.width));
+        return this.x - this.radius >= obj.x && this.x +  this.radius <= obj.x + obj.width && (this.isRoughlyEqual(this.y + this.radius, obj.y) || this.isRoughlyEqual(this.y - this.radius, obj.y + obj.height));//obj.y + obj.height >= this.y >= obj.y && (this.isRoughlyEqual(this.x + this.radius, obj.x) || this.isRoughlyEqual(this.x - this.radius, obj.x + obj.width));
     }
 
     isInCollisionX(obj) {
         // Checks hits form left and right
-        return this.y >= obj.y && this.y <= obj.y + obj.height && (this.isRoughlyEqual(this.x + this.radius, obj.x) || this.isRoughlyEqual(this.x - this.radius, obj.x + obj.width));
+        return this.y - this.radius >= obj.y && this.y + this.radius <= obj.y + obj.height && (this.isRoughlyEqual(this.x + this.radius, obj.x) || this.isRoughlyEqual(this.x - this.radius, obj.x + obj.width));
     }
 
     move(invertVelocity) {
