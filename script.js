@@ -56,6 +56,7 @@ class Game {
         this.currentLevel = 1;
         this.maxLevel = 3;
         this.changeLevel = false;
+        this.playerScore = 0;
     }
 
     init() {
@@ -192,10 +193,12 @@ class Game {
             // Check collision in x and y between the ball and the bricks
             if (this.ball.isInCollisionX(this.bricks[i])) {
                 this.bricks.splice(i, 1);   // Remove the brick who has been touched by the ball
+                this.playerScore += 100;
                 return "x";
             }
             if (this.ball.isInCollisionY(this.bricks[i])) {
                 this.bricks.splice(i, 1);
+                this.playerScore += 100;
                 return "y";
             }
         }
@@ -270,6 +273,10 @@ class Game {
         ctx.strokeText("GameOver", x + 50 - 5, y + 125);
         ctx.fillText("GameOver", x + 50, y + 125);
 
+        // The score of the player
+        ctx.font = "40px sans-serif";
+        ctx.fillText("Your score is " + this.playerScore, this.width / 2 - 20, y + 198);
+
         // text to restart the game
         ctx.font = "20px sans-serif";
         ctx.fillText("Press R to restart", 100, this.height - 50);
@@ -280,6 +287,7 @@ class Game {
         this.gameOver = this.gameWin = false;
         this.gameStop = true;
         this.currentLevel = 1;
+        this.playerScore = 0;
         this.init(ctx);
         this.draw(ctx);
     }
