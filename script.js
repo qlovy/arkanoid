@@ -39,11 +39,6 @@ function getKey(e) {
     }
 }
 
-function isRoughlyEqual(fixedValue, valueToRound) {
-    let tol = 4;
-    return fixedValue > valueToRound - tol && fixedValue < valueToRound + tol;
-}
-
 class Game {
     constructor(x, y, width, height) {
         this.x = x;
@@ -187,18 +182,18 @@ class Game {
 
     // Check collisions between ball and others objects
     checkCollision() {
-        let coll;
+        let coll;   // contain the side of the collision
         // check with all the bricks
         for (let i = 0; i < this.bricks.length; i++) {
             coll = this.ball.whereInCollision(this.bricks[i]);
+            // If there's a collision (x or y)
             if (coll != ""){
                 this.bricks.splice(i, 1);
                 return coll
             }
         }
 
-        // check with the stick
-        // Check x and y 
+        // check with the stick 
         coll = this.ball.whereInCollision(this.stick);
         if (coll != ""){
             return coll
@@ -362,38 +357,21 @@ class Ball {
         //      (^) --> from the bottom (this.x)
 
         let dyb, dya, dxb, dxa = 0;
-        dyb = this.y + this.radius - obj.y;
-        dya = obj.y + obj.height - this.y + this.radius;
-        dxb = this.x + this.radius - obj.x;
-        dxa = obj.x + obj.width - this.x + this.radius;
-        if (dyb > 0 && dxb > 0 && dya > 0 && dxa > 0){   
-            let dmin = Math.min(dyb, dya, dxb, dxa); 
+        dyb = this.y + this.radius - obj.y; // distance between the the top of the box and the bottom of the ball
+        dya = obj.y + obj.height - this.y + this.radius; // distance between the bottom of the box and the top of the ball 
+        dxb = this.x + this.radius - obj.x; // distance between the left of the box and the left of the ball
+        dxa = obj.x + obj.width - this.x + this.radius; // distance between the right of the box and the right of the ball
+        // If the ball is inside the box, so there's a collision
+        if (dyb > 0 && dxb > 0 && dya > 0 && dxa > 0){
+            let dmin = Math.min(dyb, dya, dxb, dxa);    // determin the minimum distance, so the side who is in collision
             if (dmin === dyb || dmin === dya){
                 return "y";
             }else{
-                return "x"
+                return "x";
             }
         }else{
             return "";
         }
-    }
-
-    isInCollisionY(obj) {
-        // first check a hit from the top and then a hit from the bottom
-        // Pattern explain: we check a range in X and a specific point in y
-        // Exemple:
-        //      (v) --> from the top (this.x)
-        // --------------   --> the coordinates (x, y) of theses pointes should match
-        // |            |
-        // --------------   --> same here
-        //      (^) --> from the bottom (this.x)
-        // I had a roughly equal because we can't catch always when it's perfectly align.
-        return this.x >= obj.x && this.x <= obj.x + obj.width && (isRoughlyEqual(this.y + this.radius, obj.y) || isRoughlyEqual(this.y - this.radius, obj.y + obj.height));
-    }
-
-    isInCollisionX(obj) {
-        // Checks hits form left and right
-        return this.y >= obj.y && this.y <= obj.y + obj.height && (isRoughlyEqual(this.x + this.radius, obj.x) || isRoughlyEqual(this.x - this.radius, obj.x + obj.width));
     }
 
     move(invertVelocity) {
