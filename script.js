@@ -344,7 +344,7 @@ class Ball {
             this.velocityY = -2;
         }
         // While the ball is too slow
-        while (this.velocityX <= 0.9 && this.velocityY >= -0.9){
+        while (this.velocityX <= 0.9 && this.velocityX >= -0.9){
             // Generate a new number
             this.velocityX = Math.floor(Math.random() * (6 + 6) - 6);
         }
