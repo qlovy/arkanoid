@@ -190,7 +190,7 @@ class Game {
             // If there's a collision (x or y)
             if (coll != ""){
                 this.bricks.splice(i, 1);
-                this.this.playerScore += 100;
+                this.playerScore += 100;
                 return coll
             }
         }
