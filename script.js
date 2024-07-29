@@ -187,39 +187,34 @@ class Game {
 
     // Check collisions between ball and others objects
     checkCollision() {
+        let coll;
         // check with all the bricks
         for (let i = 0; i < this.bricks.length; i++) {
-            // Check collision in x and y between the ball and the bricks
-            if (this.ball.isInCollisionX(this.bricks[i])) {
-                this.bricks.splice(i, 1);   // Remove the brick who has been touched by the ball
-                return "x";
-            }
-            if (this.ball.isInCollisionY(this.bricks[i])) {
+            coll = this.ball.whereInCollision(this.bricks[i]);
+            if (coll != ""){
                 this.bricks.splice(i, 1);
-                return "y";
+                return coll
             }
         }
 
         // check with the stick
         // Check x and y 
-        if (this.ball.isInCollisionX(this.stick)) {
-            return "x";
-        }
-        if (this.ball.isInCollisionY(this.stick)) {
-            return "y";
+        coll = this.ball.whereInCollision(this.stick);
+        if (coll != ""){
+            return coll
         }
 
         // check with the wall
         // If the ball touched the side wall
-        if (isRoughlyEqual(this.ball.x - this.ball.radius, this.x) || isRoughlyEqual(this.ball.x + this.ball.radius, this.width)) {
+        if (this.ball.x - this.ball.radius <= this.x || this.ball.x + this.ball.radius >= this.width) {
             return "x"
         }
         // If the ball touched the top wall
-        if (isRoughlyEqual(this.ball.y - this.ball.radius, this.y)) {
+        if (this.ball.y - this.ball.radius <= this.y) {
             return "y"
         }
         // If the ball touched the bottom wall
-        if (isRoughlyEqual(this.ball.y + this.ball.radius, this.height)) {
+        if (this.ball.y + this.ball.radius >= this.height) {
             return "over"
         }
         return ""
@@ -356,6 +351,31 @@ class Ball {
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
         ctx.fill();
+    }
+
+    whereInCollision(obj){
+        // Exemple:
+        //      (v) --> from the top (this.x)
+        // --------------   --> the coordinates (x, y) of theses pointes should match
+        // |            |
+        // --------------   --> same here
+        //      (^) --> from the bottom (this.x)
+
+        let dyb, dya, dxb, dxa = 0;
+        dyb = this.y + this.radius - obj.y;
+        dya = obj.y + obj.height - this.y + this.radius;
+        dxb = this.x + this.radius - obj.x;
+        dxa = obj.x + obj.width - this.x + this.radius;
+        if (dyb > 0 && dxb > 0 && dya > 0 && dxa > 0){   
+            let dmin = Math.min(dyb, dya, dxb, dxa); 
+            if (dmin === dyb || dmin === dya){
+                return "y";
+            }else{
+                return "x"
+            }
+        }else{
+            return "";
+        }
     }
 
     isInCollisionY(obj) {
