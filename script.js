@@ -194,8 +194,8 @@ class Game {
             this.draw(ctx);
         }
 
-        // Move the stick in function of the key press
-        this.stick.move();
+        // Move the stick in function of the key press, use the left wall for stopping before going into it.
+        this.stick.move(this.walls[1]);
     }
 
     // Check collisions between ball and others objects
@@ -281,7 +281,7 @@ class Game {
 
         // The score of the player
         ctx.font = "40px sans-serif";
-        ctx.fillText("Your score is " + this.playerScore, this.width / 2 - 20, y + 198);
+        ctx.fillText("Your score is " + this.playerScore, this.width / 2 - 25, y + 198);
 
         // text to restart the game
         ctx.font = "20px sans-serif";
@@ -349,13 +349,13 @@ class Stick {
         ctx.strokeRect(this.x, this.y, this.width, this.height);
     }
 
-    move() {
+    move(wall) {
         // If the key "a" or the left arrow are pressed down and the stick isn't going to exit the display
-        if ((keyDown === "a" || keyDown === "ArrowLeft") && this.x >= 0) {
+        if ((keyDown === "a" || keyDown === "ArrowLeft") && this.x >= wall.width) {
             // Move to the left
             this.x = this.x - this.speed;
             // If the key "d" or the right arrow are pressed down and the stick isn't going to exit the display
-        } else if ((keyDown === "d" || keyDown === "ArrowRight") && this.x <= canvas.width - this.width) {
+        } else if ((keyDown === "d" || keyDown === "ArrowRight") && this.x <= canvas.width - this.width - wall.width) {
             // Move to the right
             this.x = this.x + this.speed;
         }
