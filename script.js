@@ -307,8 +307,17 @@ class Brick {
     }
 
     draw(ctx) {
-        ctx.fillStyle = "#4cd137";
+        ctx.fillStyle = "#28c60f";
         ctx.fillRect(this.x, this.y, this.width, this.height);
+
+        let s = 7;
+
+        ctx.fillStyle = "#92ea84";
+        ctx.fillRect(this.x, this.y, this.width - s, this.height - s);
+
+        ctx.fillStyle = "#4cd137";
+        ctx.fillRect(this.x + s, this.y + s, this.width - 2 * s, this.height - 2 * s);
+
         ctx.strokeStyle = "black";
         ctx.lineWidth = 2;
         ctx.strokeRect(this.x, this.y, this.width, this.height);
