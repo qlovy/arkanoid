@@ -55,13 +55,15 @@ class Game {
     }
 
     init() {
+        let brickWidth = 100;
+        let brickX = this.width / 2 - 3 * brickWidth;
         // Change the bricks position depending on the level
         if (this.currentLevel === 1) {
-            this.level1();
+            this.level1(brickWidth, brickX);
         } else if (this.currentLevel === 2) {
-            this.level2();
+            this.level2(brickWidth, brickX);
         } else if (this.currentLevel === 3) {
-            this.level3();
+            this.level3(brickWidth, brickX);
         }
 
         // Create the stick
@@ -79,35 +81,33 @@ class Game {
         this.walls.push(new Wall(this.width - wallWidth, wallWidth, wallWidth, this.height - wallWidth, "V")); // Right
     }
 
-    level1() {
+    level1(brickWidth, brickX) {
         // Create a line of six bricks
         this.bricks = [];
-        let brickWidth = 100;
-        let brickX = this.width / 2 - 3 * brickWidth;
         for (let i = 0; i < 6; i++) {
-            this.bricks.push(new Brick(brickX + brickWidth * i, 200, 100, 50));
+            this.bricks.push(new Brick(brickX + brickWidth * i, 200, brickWidth, 50));
         }
     }
 
-    level2() {
+    level2(brickWidth, brickX) {
         // Create two lines of six bricks
         this.bricks = [];
         for (let i = 0; i < 2; i++) {
             for (let j = 0; j < 6; j++) {
-                this.bricks.push(new Brick(100 + 100 * j, 200 + i * 50, 100, 50))
+                this.bricks.push(new Brick(brickX + brickWidth * j, 200 + i * 50, brickWidth, 50))
             }
         }
     }
 
-    level3() {
+    level3(brickWidth, brickX) {
         // Create a checkerboard on three lines
         this.bricks = [];
         for (let i = 0; i < 3; i++) {
             for (let j = 0; j < 6; j++) {
                 if (j % 2 === 0 && i % 2 === 0) {
-                    this.bricks.push(new Brick(100 + 100 * j, 200 + i * 50, 100, 50))
+                    this.bricks.push(new Brick(brickX + brickWidth * j, 200 + i * 50, brickWidth, 50))
                 } else if (j % 2 === 1 && i % 2 === 1) {
-                    this.bricks.push(new Brick(100 + 100 * j, 200 + i * 50, 100, 50))
+                    this.bricks.push(new Brick(brickX + brickWidth * j, 200 + i * 50, brickWidth, 50))
                 }
             }
         }
@@ -220,12 +220,17 @@ class Game {
         // check with the wall
         for (let i = 0; i < this.walls.length; i++) {
             coll = this.ball.whereInCollision(this.walls[i]);
-            if (coll !== ""){
-                return coll
+            if (coll !== "") {
+                return coll;
             }
         }
+        // if the ball touch the bottom
+        if (this.ball.y >= this.height) {
+            return "over";
+        }
 
-        return ""
+
+        return "";
     }
 
     displayWin(ctx) {
@@ -439,11 +444,11 @@ class Wall {
 
             // shadow
             ctx.fillStyle = "#626262";
-            ctx.fillRect(this.x + this.width/2, this.y, this.width/3, this.height);
+            ctx.fillRect(this.x + this.width / 2, this.y, this.width / 3, this.height);
 
             // light
             ctx.fillStyle = "#ffffff";
-            ctx.fillRect(this.x + this.width/6, this.y, this.width/ 6, this.height);
+            ctx.fillRect(this.x + this.width / 6, this.y, this.width / 6, this.height);
         }
     }
 }
