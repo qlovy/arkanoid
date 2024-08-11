@@ -1,6 +1,6 @@
 // Link between the variable and the html tags
 const canvas = document.getElementById("game-canvas");
-canvas.width = canvas.Width = 800;
+canvas.width = canvas.Width = 900;
 canvas.height = canvas.Height = 800;
 ctx = canvas.getContext("2d");
 
@@ -56,11 +56,11 @@ class Game {
 
     init() {
         // Change the bricks position depending on the level
-        if (this.currentLevel === 1){
+        if (this.currentLevel === 1) {
             this.level1();
-        }else if (this.currentLevel === 2){
+        } else if (this.currentLevel === 2) {
             this.level2();
-        }else if (this.currentLevel === 3){
+        } else if (this.currentLevel === 3) {
             this.level3();
         }
 
@@ -69,41 +69,51 @@ class Game {
 
         // Draw the ball
         this.ball = new Ball(400, 685, 10);
+
+        // Draw the walls
+        this.walls = [];
+        let wallWidth = 42; // 42 because it's 6x7 (we need a multiple of 6)
+
+        this.walls.push(new Wall(0, 0, this.width, wallWidth, "H")); // Top
+        this.walls.push(new Wall(0, wallWidth, wallWidth, this.height - wallWidth, "V")); // Left
+        this.walls.push(new Wall(this.width - wallWidth, wallWidth, wallWidth, this.height - wallWidth, "V")); // Right
     }
 
     level1() {
         // Create a line of six bricks
         this.bricks = [];
+        let brickWidth = 100;
+        let brickX = this.width / 2 - 3 * brickWidth;
         for (let i = 0; i < 6; i++) {
-            this.bricks.push(new Brick(100 + 100 * i, 200, 100, 50));
+            this.bricks.push(new Brick(brickX + brickWidth * i, 200, 100, 50));
         }
     }
 
-    level2(){
+    level2() {
         // Create two lines of six bricks
         this.bricks = [];
-        for (let i = 0; i < 2; i++){
-            for (let j = 0; j < 6; j++){
+        for (let i = 0; i < 2; i++) {
+            for (let j = 0; j < 6; j++) {
                 this.bricks.push(new Brick(100 + 100 * j, 200 + i * 50, 100, 50))
             }
         }
     }
 
-    level3(){
+    level3() {
         // Create a checkerboard on three lines
         this.bricks = [];
-        for (let i = 0; i < 3; i++){
-            for (let j = 0; j < 6; j++){
-                if (j % 2 === 0 && i % 2 === 0){
+        for (let i = 0; i < 3; i++) {
+            for (let j = 0; j < 6; j++) {
+                if (j % 2 === 0 && i % 2 === 0) {
                     this.bricks.push(new Brick(100 + 100 * j, 200 + i * 50, 100, 50))
-                }else if (j % 2 === 1 && i % 2 === 1){
+                } else if (j % 2 === 1 && i % 2 === 1) {
                     this.bricks.push(new Brick(100 + 100 * j, 200 + i * 50, 100, 50))
                 }
             }
         }
     }
 
-    changeOfLevel(ctx){
+    changeOfLevel(ctx) {
         // Increment the current level
         this.currentLevel++;
 
@@ -114,9 +124,9 @@ class Game {
         // Show the new current level number
         ctx.fillStyle = "white";
         ctx.font = "bold 50px sans-serif";
-        ctx.fillText("Now Level " + this.currentLevel + " !", this.width/2 - 150, this.height/2);
+        ctx.fillText("Now Level " + this.currentLevel + " !", this.width / 2 - 150, this.height / 2);
 
-        // Initalise the new level
+        // Initialise the new level
         this.init();
     }
 
@@ -136,10 +146,16 @@ class Game {
         // Draw the ball
         this.ball.draw(ctx);
 
+        // Draw the walls
+        for (let i = 0; i < this.walls.length; i++) {
+            this.walls[i].draw(ctx);
+        }
+
+
         // Draw the number of level
         ctx.fillStyle = "white";
         ctx.font = "italic 20px sans-serif";
-        ctx.fillText("Level " + this.currentLevel, this.width/2 - 30, this.height -  30);
+        ctx.fillText("Level " + this.currentLevel, this.width / 2 - 30, this.height - 30);
 
         // If the game is stopped
         if (this.gameStop) {
@@ -159,12 +175,12 @@ class Game {
         // If the game is going to be over
         if (this.state === "over") {
             this.gameOver = true;
-        // If all the bricks are been removed
+            // If all the bricks are been removed
         } else if (this.bricks.length === 0) {
             // If this the end of the game, all the level have been done
-            if (this.currentLevel === this.maxLevel){
+            if (this.currentLevel === this.maxLevel) {
                 this.gameWin = true;
-            }else{
+            } else {
                 // Display the changement of level
                 this.changeOfLevel(ctx);
                 // Ask for a changement of level
@@ -188,7 +204,7 @@ class Game {
         for (let i = 0; i < this.bricks.length; i++) {
             coll = this.ball.whereInCollision(this.bricks[i]);
             // If there's a collision (x or y)
-            if (coll != ""){
+            if (coll !== "") {
                 this.bricks.splice(i, 1);
                 this.playerScore += 100;
                 return coll
@@ -197,23 +213,18 @@ class Game {
 
         // check with the stick 
         coll = this.ball.whereInCollision(this.stick);
-        if (coll != ""){
+        if (coll !== "") {
             return coll
         }
 
         // check with the wall
-        // If the ball touched the side wall
-        if (this.ball.x - this.ball.radius <= this.x || this.ball.x + this.ball.radius >= this.width) {
-            return "x"
+        for (let i = 0; i < this.walls.length; i++) {
+            coll = this.ball.whereInCollision(this.walls[i]);
+            if (coll !== ""){
+                return coll
+            }
         }
-        // If the ball touched the top wall
-        if (this.ball.y - this.ball.radius <= this.y) {
-            return "y"
-        }
-        // If the ball touched the bottom wall
-        if (this.ball.y + this.ball.radius >= this.height) {
-            return "over"
-        }
+
         return ""
     }
 
@@ -271,7 +282,7 @@ class Game {
         ctx.fillText("Press R to restart", 100, this.height - 50);
     }
 
-    restart(ctx){
+    restart(ctx) {
         // Reset to the start of the game
         this.gameOver = this.gameWin = false;
         this.gameStop = true;
@@ -341,7 +352,7 @@ class Ball {
             this.velocityY = -2;
         }
         // While the ball is too slow
-        while (this.velocityX <= 0.9 && this.velocityX >= -0.9){
+        while (this.velocityX <= 0.9 && this.velocityX >= -0.9) {
             // Generate a new number
             this.velocityX = Math.floor(Math.random() * (6 + 6) - 6);
         }
@@ -355,7 +366,7 @@ class Ball {
         ctx.fill();
     }
 
-    whereInCollision(obj){
+    whereInCollision(obj) {
         // Exemple:
         //      (v) --> from the top (this.x)
         // --------------   --> the coordinates (x, y) of theses pointes should match
@@ -363,20 +374,20 @@ class Ball {
         // --------------   --> same here
         //      (^) --> from the bottom (this.x)
 
-        let dyb, dya, dxb, dxa = 0;
-        dyb = this.y + this.radius - obj.y; // distance between the the top of the box and the bottom of the ball
+        let dyb, dya, dxb, dxa;
+        dyb = this.y + this.radius - obj.y; // distance between the top of the box and the bottom of the ball
         dya = obj.y + obj.height - this.y + this.radius; // distance between the bottom of the box and the top of the ball 
         dxb = this.x + this.radius - obj.x; // distance between the left of the box and the left of the ball
         dxa = obj.x + obj.width - this.x + this.radius; // distance between the right of the box and the right of the ball
         // If the ball is inside the box, so there's a collision
-        if (dyb > 0 && dxb > 0 && dya > 0 && dxa > 0){
+        if (dyb > 0 && dxb > 0 && dya > 0 && dxa > 0) {
             let dmin = Math.min(dyb, dya, dxb, dxa);    // determin the minimum distance, so the side who is in collision
-            if (dmin === dyb || dmin === dya){
+            if (dmin === dyb || dmin === dya) {
                 return "y";
-            }else{
+            } else {
                 return "x";
             }
-        }else{
+        } else {
             return "";
         }
     }
@@ -393,6 +404,50 @@ class Ball {
     }
 }
 
+class Wall {
+    constructor(x, y, width, height, type) {
+        this.x = x;
+        this.y = y;
+        this.width = width;
+        this.height = height;
+        this.type = type;
+    }
+
+    draw(ctx) {
+        // Here we use color from the wikipedia image, save here (/src/Arkanoid.png).
+        // All the mathematical operation are based on the fact that the wall were 6 pixel thick.
+
+        // Draw the tube horizontal
+        if (this.type === "H") {
+            // background color
+            ctx.fillStyle = "#8f8f8f";
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+
+            // shadow
+            ctx.fillStyle = "#626262";
+            ctx.fillRect(this.x, this.y + this.height / 2, this.width, this.height / 3);
+
+            // light
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(this.x, this.y + this.height / 6, this.width, this.height / 6);
+
+            // Draw the tube vertical
+        } else if (this.type === "V") {
+            // background color
+            ctx.fillStyle = "#8f8f8f";
+            ctx.fillRect(this.x, this.y, this.width, this.height);
+
+            // shadow
+            ctx.fillStyle = "#626262";
+            ctx.fillRect(this.x + this.width/2, this.y, this.width/3, this.height);
+
+            // light
+            ctx.fillStyle = "#ffffff";
+            ctx.fillRect(this.x + this.width/6, this.y, this.width/ 6, this.height);
+        }
+    }
+}
+
 arkanoid = new Game(0, 0, canvas.width, canvas.height);
 arkanoid.init(ctx);
 arkanoid.draw(ctx);
@@ -403,16 +458,16 @@ draw = function () {
         window.requestAnimationFrame(draw)
     }
     // If no change of level are required
-    if (!arkanoid.changeLevel){
+    if (!arkanoid.changeLevel) {
         arkanoid.play(ctx);
-    }else{
+    } else {
         // Will execute the function after 2 seconds
         setTimeout(() => {
             arkanoid.changeLevel = false;
             draw();
         }, 2000);
     }
-    
+
     // If the game is over (win or loose)
     if (arkanoid.gameWin) {
         arkanoid.displayWin(ctx);
