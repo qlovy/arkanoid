@@ -11,3 +11,4 @@ This is a version of Arkanoid for my dad, but it's realised by me.
 - [ ] upgarde the design of the decoration
 - [ ] add a system of time combine with the score
 - [ ] add the real bar of arkanoid (with complex rebound)
+- [ ] if r is pressed but the game has start, restart completely (like after gameover)
