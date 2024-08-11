@@ -55,59 +55,60 @@ class Game {
     }
 
     init() {
-        let brickWidth = 100;
+        let brickWidth = this.width/9;
         let brickX = this.width / 2 - 3 * brickWidth;
+        let brickY = this.height / 4;
         // Change the bricks position depending on the level
         if (this.currentLevel === 1) {
-            this.level1(brickWidth, brickX);
+            this.level1(brickWidth, brickX, brickY);
         } else if (this.currentLevel === 2) {
-            this.level2(brickWidth, brickX);
+            this.level2(brickWidth, brickX, brickY);
         } else if (this.currentLevel === 3) {
-            this.level3(brickWidth, brickX);
+            this.level3(brickWidth, brickX, brickY);
         }
 
-        // Create the stick
-        this.stick = new Stick(this.width / 2 - 100, 700, 200, 20, 10);
+        // Create the stick, for height multiple of 7
+        this.stick = new Stick(this.width / 2 - 100, this.height/8 * 7, 200, 21, 10);
 
         // Draw the ball
-        this.ball = new Ball(this.width/2, 685, 10);
+        this.ball = new Ball(this.width/2, this.height/8 * 7 - 12, 10);
 
         // Draw the walls
         this.walls = [];
         let wallWidth = 42; // 42 because it's 6x7 (we need a multiple of 6)
 
-        this.walls.push(new Wall(0, 0, this.width, wallWidth, "H")); // Top
-        this.walls.push(new Wall(0, wallWidth, wallWidth, this.height - wallWidth, "V")); // Left
+        this.walls.push(new Wall(this.x, this.y, this.width, wallWidth, "H")); // Top
+        this.walls.push(new Wall(this.x, wallWidth, wallWidth, this.height - wallWidth, "V")); // Left
         this.walls.push(new Wall(this.width - wallWidth, wallWidth, wallWidth, this.height - wallWidth, "V")); // Right
     }
 
-    level1(brickWidth, brickX) {
+    level1(brickWidth, brickX, brickY) {
         // Create a line of six bricks
         this.bricks = [];
         for (let i = 0; i < 6; i++) {
-            this.bricks.push(new Brick(brickX + brickWidth * i, 200, brickWidth, 50));
+            this.bricks.push(new Brick(brickX + brickWidth * i, brickY, brickWidth, 50));
         }
     }
 
-    level2(brickWidth, brickX) {
+    level2(brickWidth, brickX, brickY) {
         // Create two lines of six bricks
         this.bricks = [];
         for (let i = 0; i < 2; i++) {
             for (let j = 0; j < 6; j++) {
-                this.bricks.push(new Brick(brickX + brickWidth * j, 200 + i * 50, brickWidth, 50))
+                this.bricks.push(new Brick(brickX + brickWidth * j, brickY + i * 50, brickWidth, 50))
             }
         }
     }
 
-    level3(brickWidth, brickX) {
+    level3(brickWidth, brickX, brickY) {
         // Create a checkerboard on three lines
         this.bricks = [];
         for (let i = 0; i < 3; i++) {
             for (let j = 0; j < 6; j++) {
                 if (j % 2 === 0 && i % 2 === 0) {
-                    this.bricks.push(new Brick(brickX + brickWidth * j, 200 + i * 50, brickWidth, 50))
+                    this.bricks.push(new Brick(brickX + brickWidth * j, brickY + i * 50, brickWidth, 50))
                 } else if (j % 2 === 1 && i % 2 === 1) {
-                    this.bricks.push(new Brick(brickX + brickWidth * j, 200 + i * 50, brickWidth, 50))
+                    this.bricks.push(new Brick(brickX + brickWidth * j, brickY + i * 50, brickWidth, 50))
                 }
             }
         }
@@ -169,7 +170,7 @@ class Game {
     }
 
     play(ctx) {
-        // Update the state of the mouvement of the ball
+        // Update the state of the movement of the ball
         this.state = this.checkCollision()
 
         // If the game is going to be over
@@ -181,9 +182,9 @@ class Game {
             if (this.currentLevel === this.maxLevel) {
                 this.gameWin = true;
             } else {
-                // Display the changement of level
+                // Display the change of level
                 this.changeOfLevel(ctx);
-                // Ask for a changement of level
+                // Ask for a change of level
                 this.changeLevel = true;
             }
         } else {
@@ -334,8 +335,17 @@ class Stick {
     }
 
     draw(ctx) {
-        ctx.fillStyle = "#7f8fa6";
+        // make a tube
+        // background
+        ctx.fillStyle = "#626262";
         ctx.fillRect(this.x, this.y, this.width, this.height);
+        // shadow
+        ctx.fillStyle = "#8f8f8f";
+        ctx.fillRect(this.x, this.y + this.height/7, this.width, this.height/7 * 4);
+        // light
+        ctx.fillStyle = "#ffffff";
+        ctx.fillRect(this.x, this.y + this.height/7 * 2, this.width, this.height/7);
+
         ctx.strokeRect(this.x, this.y, this.width, this.height);
     }
 
