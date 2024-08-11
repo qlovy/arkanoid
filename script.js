@@ -67,10 +67,10 @@ class Game {
         }
 
         // Create the stick
-        this.stick = new Stick(300, 700, 200, 20, 10);
+        this.stick = new Stick(this.width / 2 - 100, 700, 200, 20, 10);
 
         // Draw the ball
-        this.ball = new Ball(400, 685, 10);
+        this.ball = new Ball(this.width/2, 685, 10);
 
         // Draw the walls
         this.walls = [];
