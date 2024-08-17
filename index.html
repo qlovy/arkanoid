@@ -1,21 +1,34 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <title>Arkanoid</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
     <link href="style.css" rel="stylesheet">
     <script src="script.js" defer></script>
 </head>
-<body>
-    <h1>Arkanoid</h1>
-    <p><em>This is for my dad</em></p>
 
-    <canvas id="game-canvas"></canvas>
+<body>
+    <h1 id="title" class="press-start-2p-regular">Arkanoid</h1>
+    <p id="subtitle"><em>This is for my dad</em></p>
+
+        <canvas id="game-canvas"></canvas>
+        <div id="game-score" class="press-start-2p-regular">
+            <h2>High Score</h2>
+            <p id="hight-score">0</p>
+            <h2>Your score</h2>
+            <p id="current-score">0</p>
+        </div>
 
     <div id="game-controls">
-        <H3>Controls</H3>
+        <h3>Controls</h3>
         <p>Left: A or LeftArrow / Right: D or RightArrow</p>
     </div>
-    <p style="font-size: 20px;"><em>For better user experience, i recommand playing in full screen. Have fun !</em></p>
+    <p id="advice"><em>For better experience, i recommand playing in full screen. Have fun !</em></p>
+    
 </body>
+
 </html>
