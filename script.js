@@ -14,6 +14,23 @@ watchKey.addEventListener("keyup", () => {
     keyDown = 0;    // Reset when the key is up
 });
 
+// Link to high score
+const elHighScore = document.getElementById("high-score");
+
+let highScore = 0;
+// If a high score already exist
+if (localStorage.getItem("highScore") != null){
+    highScore = localStorage.getItem("highScore");
+}else{
+    // Create a localStorage place to store next high scores
+    localStorage.setItem("highScore", highScore);
+}
+// Display it
+elHighScore.textContent = highScore;
+
+// Link to current score
+const elCurrentScore = document.getElementById("current-score");
+
 // Catch all the mouseup event
 canvas.addEventListener("mouseup", (e) => {
     // If the right button is pressed
@@ -196,6 +213,8 @@ class Game {
 
         // Move the stick in function of the key press, use the left wall for stopping before going into it.
         this.stick.move(this.walls[1]);
+
+        this.manageScore();
     }
 
     // Check collisions between ball and others objects
@@ -229,7 +248,6 @@ class Game {
         if (this.ball.y >= this.height) {
             return "over";
         }
-
 
         return "";
     }
@@ -279,10 +297,6 @@ class Game {
         ctx.strokeText("GameOver", x + 50 - 5, y + 125);
         ctx.fillText("GameOver", x + 50, y + 125);
 
-        // The score of the player
-        ctx.font = "40px sans-serif";
-        ctx.fillText("Your score is " + this.playerScore, this.width / 2 - 25, y + 198);
-
         // text to restart the game
         ctx.font = "20px sans-serif";
         ctx.fillText("Press R to restart", 100, this.height - 50);
@@ -294,8 +308,20 @@ class Game {
         this.gameStop = true;
         this.currentLevel = 1;
         this.playerScore = 0;
+        this.manageScore();
         this.init(ctx);
         this.draw(ctx);
+    }
+
+    manageScore(){
+        // if a new high score has been reached
+        if (this.playerScore > highScore){
+            localStorage.setItem("highScore", this.playerScore);
+            highScore = this.playerScore;
+        }
+        // display the high score and the current score.
+        elHighScore.textContent = highScore;
+        elCurrentScore.textContent = this.playerScore;
     }
 }
 
