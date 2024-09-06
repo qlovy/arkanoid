@@ -19,9 +19,9 @@ const elHighScore = document.getElementById("high-score");
 
 let highScore = 0;
 // If a high score already exist
-if (localStorage.getItem("highScore") != null){
+if (localStorage.getItem("highScore") != null) {
     highScore = localStorage.getItem("highScore");
-}else{
+} else {
     // Create a localStorage place to store next high scores
     localStorage.setItem("highScore", highScore);
 }
@@ -72,23 +72,18 @@ class Game {
     }
 
     init() {
-        let brickWidth = this.width/9;
+        let brickWidth = this.width / 9;
         let brickX = this.width / 2 - 3 * brickWidth;
         let brickY = this.height / 4;
-        // Change the bricks position depending on the level
-        if (this.currentLevel === 1) {
-            this.level1(brickWidth, brickX, brickY);
-        } else if (this.currentLevel === 2) {
-            this.level2(brickWidth, brickX, brickY);
-        } else if (this.currentLevel === 3) {
-            this.level3(brickWidth, brickX, brickY);
-        }
+
+        // Generate the new level
+        this.bricks = this.generateLevel(brickWidth, brickX, brickY);
 
         // Create the stick, for height multiple of 7
-        this.stick = new Stick(this.width / 2 - 100, this.height/8 * 7, 200, 21, 5);
+        this.stick = new Stick(this.width / 2 - 100, this.height / 8 * 7, 200, 21, 2);
 
         // Draw the ball
-        this.ball = new Ball(this.width/2, this.height/8 * 7 - 12, 10);
+        this.ball = new Ball(this.width / 2, this.height / 8 * 7 - 12, 10);
 
         // Draw the walls
         this.walls = [];
@@ -99,36 +94,21 @@ class Game {
         this.walls.push(new Wall(this.width - wallWidth, wallWidth, wallWidth, this.height - wallWidth, "V")); // Right
     }
 
-    level1(brickWidth, brickX, brickY) {
-        // Create a line of six bricks
+    generateLevel(brickWidth, brickX, brickY) {
+        let width = 6;
+        let height = 5;
         this.bricks = [];
-        for (let i = 0; i < 6; i++) {
-            this.bricks.push(new Brick(brickX + brickWidth * i, brickY, brickWidth, 50));
-        }
-    }
 
-    level2(brickWidth, brickX, brickY) {
-        // Create two lines of six bricks
-        this.bricks = [];
-        for (let i = 0; i < 2; i++) {
-            for (let j = 0; j < 6; j++) {
-                this.bricks.push(new Brick(brickX + brickWidth * j, brickY + i * 50, brickWidth, 50))
-            }
-        }
-    }
-
-    level3(brickWidth, brickX, brickY) {
-        // Create a checkerboard on three lines
-        this.bricks = [];
-        for (let i = 0; i < 3; i++) {
-            for (let j = 0; j < 6; j++) {
-                if (j % 2 === 0 && i % 2 === 0) {
-                    this.bricks.push(new Brick(brickX + brickWidth * j, brickY + i * 50, brickWidth, 50))
-                } else if (j % 2 === 1 && i % 2 === 1) {
-                    this.bricks.push(new Brick(brickX + brickWidth * j, brickY + i * 50, brickWidth, 50))
+        for (let i=0; i<width; i++){
+            for (let j=0; j<height; j++){
+                // If the generate number is a 1. The + 0.2 is to boost the percentage of 1.
+                if (Math.round(Math.random()  + 0.1)) {
+                    this.bricks.push(new Brick(brickX + brickWidth * i, brickY + j * 50, brickWidth, 50));
                 }
             }
         }
+
+        return this.bricks;
     }
 
     changeOfLevel(ctx) {
@@ -313,9 +293,9 @@ class Game {
         this.draw(ctx);
     }
 
-    manageScore(){
+    manageScore() {
         // if a new high score has been reached
-        if (this.playerScore > highScore){
+        if (this.playerScore > highScore) {
             localStorage.setItem("highScore", this.playerScore);
             highScore = this.playerScore;
         }
@@ -367,10 +347,10 @@ class Stick {
         ctx.fillRect(this.x, this.y, this.width, this.height);
         // shadow
         ctx.fillStyle = "#8f8f8f";
-        ctx.fillRect(this.x, this.y + this.height/7, this.width, this.height/7 * 4);
+        ctx.fillRect(this.x, this.y + this.height / 7, this.width, this.height / 7 * 4);
         // light
         ctx.fillStyle = "#ffffff";
-        ctx.fillRect(this.x, this.y + this.height/7 * 2, this.width, this.height/7);
+        ctx.fillRect(this.x, this.y + this.height / 7 * 2, this.width, this.height / 7);
 
         ctx.strokeRect(this.x, this.y, this.width, this.height);
     }
@@ -393,18 +373,13 @@ class Ball {
         this.x = x;
         this.y = y;
         this.radius = radius;
-        this.velocityX = Math.floor(Math.random() * (6 + 6) - 6);   // Generate a number between -6 inclusive and 6 exculsive
-        this.velocityY = -6;
-        // If the window is bigger than 1920x180
-        if (window.innerWidth > 1920) {
-            // Reduce the ball speed
-            this.velocityX = -2;
-            this.velocityY = -2;
-        }
+        this.velocityX = Math.floor(Math.random() * (4) - 2);   // Generate a number between -2 inclusive and 2 exclusive
+        this.velocityY = -2;
+
         // While the ball is too slow
         while (this.velocityX <= 0.9 && this.velocityX >= -0.9) {
             // Generate a new number
-            this.velocityX = Math.floor(Math.random() * (6 + 6) - 6);
+            this.velocityX = Math.floor(Math.random() * (4) - 2);
         }
     }
 
@@ -431,7 +406,7 @@ class Ball {
         dxa = obj.x + obj.width - this.x + this.radius; // distance between the right of the box and the right of the ball
         // If the ball is inside the box, so there's a collision
         if (dyb > 0 && dxb > 0 && dya > 0 && dxa > 0) {
-            let dmin = Math.min(dyb, dya, dxb, dxa);    // determin the minimum distance, so the side who is in collision
+            let dmin = Math.min(dyb, dya, dxb, dxa);    // determine the minimum distance, so the side who is in collision
             if (dmin === dyb || dmin === dya) {
                 return "y";
             } else {
