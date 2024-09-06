@@ -16,7 +16,8 @@ body {
 }
 
 #game-canvas {
-    display: inline-block;
+    display: block;
+    margin: auto;
 }
 
 #game-controls{
@@ -26,11 +27,10 @@ body {
 }
 
 #game-score {
-    display: inline-block;
+    position: absolute;
+    right: 5%;
+    top: 30%;
     text-align: center;
-    margin-left: 100px;
-    position: relative;
-    bottom: 500px;
 }
 
 #game-score h2 {

@@ -85,7 +85,7 @@ class Game {
         }
 
         // Create the stick, for height multiple of 7
-        this.stick = new Stick(this.width / 2 - 100, this.height/8 * 7, 200, 21, 10);
+        this.stick = new Stick(this.width / 2 - 100, this.height/8 * 7, 200, 21, 5);
 
         // Draw the ball
         this.ball = new Ball(this.width/2, this.height/8 * 7 - 12, 10);
