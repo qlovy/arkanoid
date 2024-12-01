@@ -12,3 +12,4 @@ This is a version of Arkanoid for my dad, but it's realised by me.
 - [ ] add a system of time combine with the score
 - [ ] add the real bar of arkanoid (with complex rebound)
 - [ ] if r is pressed but the game has start, restart completely (like after gameover)
+- [ ] make a level of difficulty in terms of speed (easy, medium and hard)
