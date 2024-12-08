@@ -25,6 +25,7 @@ if (localStorage.getItem("highScore") != null) {
     // Create a localStorage place to store next high scores
     localStorage.setItem("highScore", highScore);
 }
+
 // Display it
 elHighScore.textContent = highScore;
 
@@ -63,12 +64,12 @@ class Game {
         this.width = width;
         this.height = height;
         this.gameOver = false;
-        this.gameWin = false;
         this.gameStop = true;
         this.currentLevel = 1;
         this.maxLevel = 3;
         this.changeLevel = false;
         this.playerScore = 0;
+        this.newHighScore = false;
     }
 
     init() {
@@ -80,7 +81,7 @@ class Game {
         this.bricks = this.generateLevel(brickWidth, brickX, brickY);
 
         // Create the stick, for height multiple of 7
-        this.stick = new Stick(this.width / 2 - 100, this.height / 8 * 7, 200, 21, 2);
+        this.stick = new Stick(this.width / 2 - 100, this.height / 8 * 7, 200, 21, 4);
 
         // Draw the ball
         this.ball = new Ball(this.width / 2, this.height / 8 * 7 - 12, 10);
@@ -175,15 +176,10 @@ class Game {
             this.gameOver = true;
             // If all the bricks are been removed
         } else if (this.bricks.length === 0) {
-            // If this the end of the game, all the level have been done
-            if (this.currentLevel === this.maxLevel) {
-                this.gameWin = true;
-            } else {
-                // Display the change of level
-                this.changeOfLevel(ctx);
-                // Ask for a change of level
-                this.changeLevel = true;
-            }
+            // Display the change of level
+            this.changeOfLevel(ctx);
+            // Ask for a change of level
+            this.changeLevel = true;
         } else {
             // Apply the state to the movement of the ball
             this.ball.move(this.state);
@@ -284,7 +280,8 @@ class Game {
 
     restart(ctx) {
         // Reset to the start of the game
-        this.gameOver = this.gameWin = false;
+        this.gameOver = false;
+        this.newHighScore = false;
         this.gameStop = true;
         this.currentLevel = 1;
         this.playerScore = 0;
@@ -298,6 +295,7 @@ class Game {
         if (this.playerScore > highScore) {
             localStorage.setItem("highScore", this.playerScore);
             highScore = this.playerScore;
+            this.newHighScore = true;
         }
         // display the high score and the current score.
         elHighScore.textContent = highScore;
@@ -373,7 +371,7 @@ class Ball {
         this.x = x;
         this.y = y;
         this.radius = radius;
-        this.velocityX = Math.floor(Math.random() * (4) - 2);   // Generate a number between -2 inclusive and 2 exclusive
+        this.velocityX = Math.floor(Math.random() * (6) - 3);   // Generate a number between -2 inclusive and 2 exclusive
         this.velocityY = -2;
 
         // While the ball is too slow
@@ -477,9 +475,11 @@ arkanoid = new Game(0, 0, canvas.width, canvas.height);
 arkanoid.init(ctx);
 arkanoid.draw(ctx);
 
+// Game Loop
 draw = function () {
     // If the game is not over
     if (!arkanoid.gameOver && !arkanoid.gameWin && !arkanoid.changeLevel) {
+        // Call himself 60 times per second
         window.requestAnimationFrame(draw)
     }
     // If no change of level are required
@@ -493,10 +493,15 @@ draw = function () {
         }, 2000);
     }
 
-    // If the game is over (win or loose)
-    if (arkanoid.gameWin) {
-        arkanoid.displayWin(ctx);
-    } else if (arkanoid.gameOver) {
-        arkanoid.displayGameOver(ctx);
+    // If the game is over
+    if (arkanoid.gameOver) {
+        if (arkanoid.newHighScore){
+            arkanoid.displayWin(ctx);
+            setTimeout(() => {
+                arkanoid.displayGameOver(ctx);
+            }, 2000);
+        }else{
+            arkanoid.displayGameOver(ctx);
+        }
     }
 }
