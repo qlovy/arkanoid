@@ -12,3 +12,6 @@ This is a version of Arkanoid for my dad, but it's realised by me.
 - [ ] add a system of time combine with the score
 - [ ] add the real bar of arkanoid (with complex rebound)
 - [ ] if r is pressed but the game has start, restart completely (like after gameover)
+- [x] with random level generator, display win when a new high score is reached before the game over.
+- [ ] Use vector (like Processing JS)
+- [ ] Make the ball increase each time it hits a brick.
