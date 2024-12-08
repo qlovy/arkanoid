@@ -244,7 +244,7 @@ class Game {
         // The text
         ctx.fillStyle = "white";
         ctx.font = "70px serif";
-        ctx.fillText("Well done !", this.width / 2 - 150, this.height / 2 + 150);
+        ctx.fillText("Well done ! Keep pushing !", this.width / 2 - 150, this.height / 2 + 150);
 
         // text to restart the game
         ctx.font = "20px sans-serif";
