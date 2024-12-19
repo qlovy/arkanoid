@@ -13,6 +13,6 @@ This is a version of Arkanoid for my dad, but it's realised by me.
 - [ ] add the real bar of arkanoid (with complex rebound) => specific branch
 - [ ] if r is pressed but the game has start, restart completely (like after gameover)
 - [x] with random level generator, display win when a new high score is reached before the game over.
-- [ ] Use vector (like Processing JS) => specific branch
+- [x] Use vector (like Processing JS) => specific branch
 - [ ] Make the ball increase each time it hits a brick.
 - [ ] make a level of difficulty in terms of speed (easy, medium and hard)
