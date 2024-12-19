@@ -8,7 +8,6 @@ ctx = canvas.getContext("2d");
 const watchKey = document.querySelector("body");
 // Catch all the keyDown event
 watchKey.addEventListener("keydown", getKey);
-
 // Catch all the keyUp event
 watchKey.addEventListener("keyup", () => {
     keyDown = 0;    // Reset when the key is up
@@ -66,7 +65,6 @@ class Game {
         this.gameOver = false;
         this.gameStop = true;
         this.currentLevel = 1;
-        this.maxLevel = 3;
         this.changeLevel = false;
         this.playerScore = 0;
         this.newHighScore = false;
@@ -182,7 +180,8 @@ class Game {
             this.changeLevel = true;
         } else {
             // Apply the state to the movement of the ball
-            this.ball.move(this.state);
+            //this.ball.move(this.state);
+            //this.ball.update();
             // Draw everything
             this.draw(ctx);
         }
@@ -195,37 +194,29 @@ class Game {
 
     // Check collisions between ball and others objects
     checkCollision() {
-        let coll;   // contain the side of the collision
         // check with all the bricks
+
         for (let i = 0; i < this.bricks.length; i++) {
-            coll = this.ball.whereInCollision(this.bricks[i]);
-            // If there's a collision (x or y)
-            if (coll !== "") {
-                this.bricks.splice(i, 1);
-                this.playerScore += 100;
-                return coll
-            }
+            this.ball.reactTo(this.bricks[i]);
+
         }
 
-        // check with the stick 
-        coll = this.ball.whereInCollision(this.stick);
-        if (coll !== "") {
-            return coll
-        }
 
+
+        // check with the stick
+        this.ball.reactTo(this.stick);
         // check with the wall
+        
         for (let i = 0; i < this.walls.length; i++) {
-            coll = this.ball.whereInCollision(this.walls[i]);
-            if (coll !== "") {
-                return coll;
-            }
+            
+            this.ball.reactTo(this.walls[i])
         }
+        
         // if the ball touch the bottom
-        if (this.ball.y >= this.height) {
+        if (this.ball.position.y >= this.height) {
             return "over";
         }
 
-        return "";
     }
 
     displayWin(ctx) {
@@ -368,27 +359,74 @@ class Stick {
 
 class Ball {
     constructor(x, y, radius) {
-        this.x = x;
-        this.y = y;
+        this.position = new Victor(x, y);
+        this.veloctiy = new Victor(-0.1, -0.1);
+        //this.acceleration = new Victor(0, 0);
         this.radius = radius;
-        this.velocityX = Math.floor(Math.random() * (6) - 3);   // Generate a number between -2 inclusive and 2 exclusive
-        this.velocityY = -2;
-
-        // While the ball is too slow
-        while (this.velocityX <= 0.9 && this.velocityX >= -0.9) {
-            // Generate a new number
-            this.velocityX = Math.floor(Math.random() * (4) - 2);
-        }
     }
 
     draw(ctx) {
         // Draw the ball
         ctx.fillStyle = "white";
         ctx.beginPath();
-        ctx.arc(this.x, this.y, this.radius, 0, 2 * Math.PI, false);
+        ctx.arc(this.position.x, this.position.y, this.radius, 0, 2 * Math.PI, false);
         ctx.fill();
     }
 
+    reactTo(obj){
+        /*
+        * For Bottom and Top sides,
+        *  (0, 0) ---> X
+        *  |
+        *  |
+        * \/
+        * Y
+        *     (*)
+        *   ------ (obj.x, obj.y) (obj.x + obj.width, obj.y)
+        *   |    |
+        *   ------ (obj.x, obj.y + obj.height) (obj.x, obj.y + obj.height)
+        *
+        * */
+
+        // The whole side in X
+        if (this.position.x < obj.x + obj.width && this.position.x > obj.x &&
+            // Bottom
+            ((this.position.y > obj.y + obj.height - 5 && this.position.y < obj.y + obj.height + 5)
+            // Top
+            || (this.position.y > obj.y - 5 && this.position.y < obj.y + 5))){
+            // Invert the Y attribute
+            this.veloctiy.y *= -1;
+        }
+
+        /*
+        * For Left and Right sides,
+        * +--> x
+        * !
+        * v
+        * y
+        *
+        *                              ----
+        *               (obj.x, obj.y) |  | (obj.x + obj.width, obj.y)
+        *                              |  |
+        *  (obj.x, obj.y + obj.height) |  | (obj.x + obj.width, obj.y + obj.height)
+        *                              ----
+        *
+        * */
+
+        // The whole side in Y
+        if (this.position.y < obj.y + obj.height && this.position.y > obj.y &&
+            // Right
+            ((this.position.x > obj.x + obj.width - 5 && this.position.x < obj.x + obj.width + 5)
+            // Left
+            || (this.position.x > obj.x - 5 && this.position.x < obj.x + 5))){
+            // Invert the X attribute
+            this.veloctiy.x *= -1;
+        }
+
+        // Update the ball position
+        this.position.add(this.veloctiy);
+    }
+    /*
     whereInCollision(obj) {
         // Exemple:
         //      (v) --> from the top (this.x)
@@ -414,17 +452,10 @@ class Ball {
             return "";
         }
     }
+     */
 
-    move(invertVelocity) {
-        if (invertVelocity === "x") {
-            this.velocityX *= -1
-        }
-        if (invertVelocity === "y") {
-            this.velocityY *= -1
-        }
-        this.x += this.velocityX;
-        this.y += this.velocityY;
-    }
+    // Make that the ball is smart. Like the ball need an object to determin a new vector.
+    // Then we apply this new force to the actual one.
 }
 
 class Wall {
