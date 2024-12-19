@@ -197,8 +197,9 @@ class Game {
         // check with all the bricks
 
         for (let i = 0; i < this.bricks.length; i++) {
-            this.ball.reactTo(this.bricks[i]);
-
+            if (this.ball.reactTo(this.bricks[i])){
+                this.bricks.splice(i, 1);
+            }
         }
 
 
@@ -388,6 +389,8 @@ class Ball {
         *
         * */
 
+        let state = 0;
+
         // The whole side in X
         if (this.position.x < obj.x + obj.width && this.position.x > obj.x &&
             // Bottom
@@ -396,6 +399,7 @@ class Ball {
             || (this.position.y > obj.y - 5 && this.position.y < obj.y + 5))){
             // Invert the Y attribute
             this.veloctiy.y *= -1;
+            state = 1;
         }
 
         /*
@@ -421,10 +425,14 @@ class Ball {
             || (this.position.x > obj.x - 5 && this.position.x < obj.x + 5))){
             // Invert the X attribute
             this.veloctiy.x *= -1;
+            state = 1;
         }
 
         // Update the ball position
         this.position.add(this.veloctiy);
+
+        // If we touch something or not
+        return state;
     }
     /*
     whereInCollision(obj) {
