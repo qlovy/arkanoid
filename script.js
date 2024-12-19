@@ -199,6 +199,7 @@ class Game {
         for (let i = 0; i < this.bricks.length; i++) {
             if (this.ball.reactTo(this.bricks[i])){
                 this.bricks.splice(i, 1);
+                this.playerScore += 100;
             }
         }
 
