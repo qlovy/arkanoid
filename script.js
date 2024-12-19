@@ -98,10 +98,10 @@ class Game {
         let height = 5;
         this.bricks = [];
 
-        for (let i=0; i<width; i++){
-            for (let j=0; j<height; j++){
+        for (let i = 0; i < width; i++) {
+            for (let j = 0; j < height; j++) {
                 // If the generate number is a 1. The + 0.2 is to boost the percentage of 1.
-                if (Math.round(Math.random()  + 0.1)) {
+                if (Math.round(Math.random() + 0.1)) {
                     this.bricks.push(new Brick(brickX + brickWidth * i, brickY + j * 50, brickWidth, 50));
                 }
             }
@@ -195,30 +195,25 @@ class Game {
     // Check collisions between ball and others objects
     checkCollision() {
         // check with all the bricks
-
         for (let i = 0; i < this.bricks.length; i++) {
-            if (this.ball.reactTo(this.bricks[i])){
+            if (this.ball.reactTo(this.bricks[i])) {
                 this.bricks.splice(i, 1);
                 this.playerScore += 100;
             }
         }
 
-
-
         // check with the stick
         this.ball.reactTo(this.stick);
-        // check with the wall
-        
+
+        // check with the walls
         for (let i = 0; i < this.walls.length; i++) {
-            
             this.ball.reactTo(this.walls[i])
         }
-        
+
         // if the ball touch the bottom
         if (this.ball.position.y >= this.height) {
             return "over";
         }
-
     }
 
     displayWin(ctx) {
@@ -375,7 +370,7 @@ class Ball {
         ctx.fill();
     }
 
-    reactTo(obj){
+    reactTo(obj) {
         /*
         * For Bottom and Top sides,
         *  (0, 0) ---> X
@@ -396,8 +391,8 @@ class Ball {
         if (this.position.x < obj.x + obj.width && this.position.x > obj.x &&
             // Bottom
             ((this.position.y > obj.y + obj.height - 5 && this.position.y < obj.y + obj.height + 5)
-            // Top
-            || (this.position.y > obj.y - 5 && this.position.y < obj.y + 5))){
+                // Top
+                || (this.position.y > obj.y - 5 && this.position.y < obj.y + 5))) {
             // Invert the Y attribute
             this.veloctiy.y *= -1;
             state = 1;
@@ -422,8 +417,8 @@ class Ball {
         if (this.position.y < obj.y + obj.height && this.position.y > obj.y &&
             // Right
             ((this.position.x > obj.x + obj.width - 5 && this.position.x < obj.x + obj.width + 5)
-            // Left
-            || (this.position.x > obj.x - 5 && this.position.x < obj.x + 5))){
+                // Left
+                || (this.position.x > obj.x - 5 && this.position.x < obj.x + 5))) {
             // Invert the X attribute
             this.veloctiy.x *= -1;
             state = 1;
@@ -435,6 +430,7 @@ class Ball {
         // If we touch something or not
         return state;
     }
+
     /*
     whereInCollision(obj) {
         // Exemple:
@@ -535,12 +531,12 @@ draw = function () {
 
     // If the game is over
     if (arkanoid.gameOver) {
-        if (arkanoid.newHighScore){
+        if (arkanoid.newHighScore) {
             arkanoid.displayWin(ctx);
             setTimeout(() => {
                 arkanoid.displayGameOver(ctx);
             }, 2000);
-        }else{
+        } else {
             arkanoid.displayGameOver(ctx);
         }
     }
