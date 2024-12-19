@@ -179,9 +179,6 @@ class Game {
             // Ask for a change of level
             this.changeLevel = true;
         } else {
-            // Apply the state to the movement of the ball
-            //this.ball.move(this.state);
-            //this.ball.update();
             // Draw everything
             this.draw(ctx);
         }
@@ -514,7 +511,7 @@ arkanoid.draw(ctx);
 // Game Loop
 draw = function () {
     // If the game is not over
-    if (!arkanoid.gameOver && !arkanoid.gameWin && !arkanoid.changeLevel) {
+    if (!arkanoid.gameOver && !arkanoid.changeLevel) {
         // Call himself 60 times per second
         window.requestAnimationFrame(draw)
     }
