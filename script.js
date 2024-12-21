@@ -427,37 +427,6 @@ class Ball {
         // If we touch something or not
         return state;
     }
-
-    /*
-    whereInCollision(obj) {
-        // Exemple:
-        //      (v) --> from the top (this.x)
-        // --------------   --> the coordinates (x, y) of theses pointes should match
-        // |            |
-        // --------------   --> same here
-        //      (^) --> from the bottom (this.x)
-
-        let dyb, dya, dxb, dxa;
-        dyb = this.y + this.radius - obj.y; // distance between the top of the box and the bottom of the ball
-        dya = obj.y + obj.height - this.y + this.radius; // distance between the bottom of the box and the top of the ball 
-        dxb = this.x + this.radius - obj.x; // distance between the left of the box and the left of the ball
-        dxa = obj.x + obj.width - this.x + this.radius; // distance between the right of the box and the right of the ball
-        // If the ball is inside the box, so there's a collision
-        if (dyb > 0 && dxb > 0 && dya > 0 && dxa > 0) {
-            let dmin = Math.min(dyb, dya, dxb, dxa);    // determine the minimum distance, so the side who is in collision
-            if (dmin === dyb || dmin === dya) {
-                return "y";
-            } else {
-                return "x";
-            }
-        } else {
-            return "";
-        }
-    }
-     */
-
-    // Make that the ball is smart. Like the ball need an object to determin a new vector.
-    // Then we apply this new force to the actual one.
 }
 
 class Wall {
