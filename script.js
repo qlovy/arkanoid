@@ -34,7 +34,7 @@ const elCurrentScore = document.getElementById("current-score");
 // Catch all the mouseup event
 canvas.addEventListener("mouseup", (e) => {
     // If the right button is pressed
-    if (e.button === 0) {
+    if (e.button === 0 && arkanoid.gameStop) {
         // Start the game
         arkanoid.gameStop = false;
         draw();
@@ -46,10 +46,10 @@ let keyDown;
 function getKey(e) {
     // Update the last key pressed down
     keyDown = e.key;
-    if (e.key === "r") {
+    if (e.key === "r" && arkanoid.gameOver) {
         arkanoid.restart(ctx);
     }
-    if (e.key === "Enter") {
+    if (e.key === "Enter" && arkanoid.gameStop) {
         // Start the game
         arkanoid.gameStop = false;
         draw();
