@@ -355,7 +355,6 @@ class Ball {
     constructor(x, y, radius) {
         this.position = new Victor(x, y);
         this.veloctiy = new Victor(-0.1, -0.1);
-        //this.acceleration = new Victor(0, 0);
         this.radius = radius;
     }
 
@@ -391,7 +390,7 @@ class Ball {
                 // Top
                 || (this.position.y > obj.y - 5 && this.position.y < obj.y + 5))) {
             // Invert the Y attribute
-            this.veloctiy.y *= -1;
+            this.veloctiy.y *= -1.0;
             state = 1;
         }
 
@@ -417,7 +416,7 @@ class Ball {
                 // Left
                 || (this.position.x > obj.x - 5 && this.position.x < obj.x + 5))) {
             // Invert the X attribute
-            this.veloctiy.x *= -1;
+            this.veloctiy.x *= -1.0;
             state = 1;
         }
 
