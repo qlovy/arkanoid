@@ -34,11 +34,13 @@ const elCurrentScore = document.getElementById("current-score");
 // Catch all the mouseup event
 canvas.addEventListener("mouseup", (e) => {
     // If the right button is pressed
+    /*
     if (e.button === 0 && arkanoid.gameStop) {
         // Start the game
         arkanoid.gameStop = false;
         draw();
     }
+     */
 })
 
 let keyDown;
@@ -46,14 +48,16 @@ let keyDown;
 function getKey(e) {
     // Update the last key pressed down
     keyDown = e.key;
+    /*
     if (e.key === "r" && arkanoid.gameOver) {
         arkanoid.restart(ctx);
-    }
-    if (e.key === "Enter" && arkanoid.gameStop) {
+    }else if (e.key === "Enter" && arkanoid.gameStop) {
         // Start the game
         arkanoid.gameStop = false;
         draw();
     }
+
+     */
 }
 
 class Game {
@@ -68,6 +72,85 @@ class Game {
         this.changeLevel = false;
         this.playerScore = 0;
         this.newHighScore = false;
+        this.levelDifficulty = [["Easy", 0.05, ], ["Medium", 0.1], ["Hard", 0.2]];
+        this.index = 0;
+    }
+
+    menu(ctx){
+        // In the menu we should have
+        // - Title
+        // Level of difficulty (in therms of ball speed and number of bricks, and number of points for bricks) => how do we manage a new high score => category
+        // - Easy
+        // - Medium
+        // - Hard
+        // When picking a mode, player should enter name
+        // - Score (All the scores will be saved there)
+        // - Preference (size of element or type of rebound)
+
+        let guide = "Use arrows to move and enter to select";
+        const yOffset =  130;
+        const width = 600;
+        const height = 100;
+
+        // Background
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, this.width, this.height);
+
+        // Guide text
+        ctx.font = "25px sans-serif";
+        ctx.fillStyle = "white";
+        ctx.fillText(guide, 300, 25);
+
+        class MenuItem {
+            constructor(name, x, y) {
+                this.name = name;
+                this.x = x;
+                this.y = y;
+                this.width = width;
+                this.height = height;
+            }
+
+            draw(isSelect){
+                const sp = 10;
+                // If the case is selected
+                if (isSelect){
+                    ctx.fillStyle = "#57606f";
+                    ctx.fillRect(this.x - this.width/2, this.y - this.height/2 - sp, this.width, this.height);
+                }
+                ctx.strokeStyle = "white";
+                ctx.strokeRect(this.x - this.width/2, this.y - this.height/2 - sp, this.width, this.height);
+
+                // The text
+                ctx.font = "20px sans-serif";
+                ctx.textAlign = "center";
+                ctx.fillStyle = "white";
+                ctx.fillText(this.name, this.x, this.y);
+            }
+        }
+
+        let itemsName = ["EASY", "MEDIUM", "HARD", "SCORES", "SETTINGS"];
+        let menuItems = [];
+
+        for (let i=0; i<5; i++){
+            menuItems.push(new MenuItem(itemsName[i], 400, yOffset + height * i));
+        }
+
+        for (let menuItem of menuItems){
+            menuItem.draw(false)
+        }
+
+        menuItems[this.index].draw(1);
+
+        if (keyDown === 'ArrowUp'){
+            if (this.index > 0){
+                this.index--;
+            }
+        }else if (keyDown === 'ArrowDown'){
+            if (this.index < menuItems.length - 1){
+                this.index++;
+            }
+        }
+        keyDown = '';
     }
 
     init() {
@@ -473,11 +556,15 @@ class Wall {
 }
 
 arkanoid = new Game(0, 0, canvas.width, canvas.height);
-arkanoid.init(ctx);
-arkanoid.draw(ctx);
+
+//arkanoid.init();
+//arkanoid.draw(ctx);
 
 // Game Loop
 draw = function () {
+    arkanoid.menu(ctx);
+    window.requestAnimationFrame(draw)
+    /*
     // If the game is not over
     if (!arkanoid.gameOver && !arkanoid.changeLevel) {
         // Call himself 60 times per second
@@ -505,4 +592,8 @@ draw = function () {
             arkanoid.displayGameOver(ctx);
         }
     }
+
+     */
 }
+
+draw();
