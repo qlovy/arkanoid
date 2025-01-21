@@ -9,7 +9,7 @@ const watchKey = document.querySelector("body");
 // Catch all the keyDown event
 watchKey.addEventListener("keydown", getKey);
 // Catch all the keyUp event
-watchKey.addEventListener("keyup", () => {
+watchKey.addEventListener("keyup", (e) => {
     keyDown = 0;    // Reset when the key is up
 });
 
@@ -48,6 +48,10 @@ let keyDown;
 function getKey(e) {
     // Update the last key pressed down
     keyDown = e.key;
+    // Remove the fact that the Arrow keys Up and Down move the scrol bar while using the menu's game
+    if (keyDown === 'ArrowUp' || keyDown === 'ArrowDown'){
+        e.preventDefault();
+    }
     /*
     if (e.key === "r" && arkanoid.gameOver) {
         arkanoid.restart(ctx);
