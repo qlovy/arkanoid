@@ -155,6 +155,11 @@ class Game {
             }
         }
         keyDown = '';
+        /*
+        If level of difficulty is selected, launch the game with their settings
+        If scores is selected, display an array with all the previous score and the name
+        If settings is selected, display the settings of the game that can be modified
+         */
     }
 
     init() {
