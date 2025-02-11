@@ -71,13 +71,15 @@ class Game {
         this.width = width;
         this.height = height;
         this.gameOver = false;
-        this.gameStop = true;
+        //this.gameStop = false;
         this.currentLevel = 1;
         this.changeLevel = false;
         this.playerScore = 0;
         this.newHighScore = false;
-        this.levelDifficulty = [["Easy", 0.05, ], ["Medium", 0.1], ["Hard", 0.2]];
+        this.levelDifficulty = [0.025, 0.05, 0.15];
         this.index = 0;
+        this.menuState = true;
+
     }
 
     menu(ctx){
@@ -132,15 +134,15 @@ class Game {
             }
         }
 
-        let itemsName = ["EASY", "MEDIUM", "HARD", "SCORES", "SETTINGS"];
+        let itemsName = ["EASY", "MEDIUM", "HARD", "SCORES"];
         let menuItems = [];
 
-        for (let i=0; i<5; i++){
+        for (let i=0; i<itemsName.length; i++){
             menuItems.push(new MenuItem(itemsName[i], 400, yOffset + height * i));
         }
 
         for (let menuItem of menuItems){
-            menuItem.draw(false)
+            menuItem.draw(0)
         }
 
         menuItems[this.index].draw(1);
@@ -153,13 +155,24 @@ class Game {
             if (this.index < menuItems.length - 1){
                 this.index++;
             }
+        }else if (keyDown === 'Enter'){
+            if (this.index >= 0 && this.index <= 2){
+                this.menuState = false;
+                this.init();
+                this.draw(ctx);
+            }else{
+                this.showScore();
+            }
         }
         keyDown = '';
         /*
         If level of difficulty is selected, launch the game with their settings
         If scores is selected, display an array with all the previous score and the name
-        If settings is selected, display the settings of the game that can be modified
          */
+    }
+
+    showScore(){
+        console.log("Showing score with name of player");
     }
 
     init() {
@@ -174,7 +187,7 @@ class Game {
         this.stick = new Stick(this.width / 2 - 100, this.height / 8 * 7, 200, 21, 4);
 
         // Draw the ball
-        this.ball = new Ball(this.width / 2, this.height / 8 * 7 - 12, 10);
+        this.ball = new Ball(this.width / 2, this.height / 8 * 7 - 12, 10, this.levelDifficulty[this.index]);
 
         // Draw the walls
         this.walls = [];
@@ -247,6 +260,7 @@ class Game {
         ctx.fillText("Level " + this.currentLevel, this.width / 2 - 30, this.height - 30);
 
         // If the game is stopped
+        /*
         if (this.gameStop) {
             // Make a transparency rectangle
             ctx.fillStyle = "rgb(0 0 0 / 30%)";
@@ -255,6 +269,7 @@ class Game {
             ctx.font = "30px sans-serif"
             ctx.fillText("Right-click here or Enter to start", this.width / 2 - 200, this.height / 2);
         }
+        */
     }
 
     play(ctx) {
@@ -444,9 +459,9 @@ class Stick {
 }
 
 class Ball {
-    constructor(x, y, radius) {
+    constructor(x, y, radius, vOffset) {
         this.position = new Victor(x, y);
-        this.veloctiy = new Victor(-0.1, -0.1);
+        this.veloctiy = new Victor(-vOffset, -vOffset);
         this.radius = radius;
     }
 
@@ -566,28 +581,24 @@ class Wall {
 
 arkanoid = new Game(0, 0, canvas.width, canvas.height);
 
-//arkanoid.init();
-//arkanoid.draw(ctx);
-
 // Game Loop
 draw = function () {
-    arkanoid.menu(ctx);
-    window.requestAnimationFrame(draw)
-    /*
-    // If the game is not over
-    if (!arkanoid.gameOver && !arkanoid.changeLevel) {
-        // Call himself 60 times per second
-        window.requestAnimationFrame(draw)
-    }
-    // If no change of level are required
-    if (!arkanoid.changeLevel) {
+    if (arkanoid.menuState){
+        arkanoid.menu(ctx);
+    }else if (!arkanoid.changeLevel){
         arkanoid.play(ctx);
-    } else {
+    }else{
         // Will execute the function after 2 seconds
         setTimeout(() => {
             arkanoid.changeLevel = false;
             draw();
         }, 2000);
+    }
+
+    // If the game is not over
+    if (!arkanoid.gameOver && !arkanoid.changeLevel) {
+        // Call himself 60 times per second
+        window.requestAnimationFrame(draw)
     }
 
     // If the game is over
@@ -601,8 +612,6 @@ draw = function () {
             arkanoid.displayGameOver(ctx);
         }
     }
-
-     */
 }
 
 draw();
