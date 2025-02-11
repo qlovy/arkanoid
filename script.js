@@ -44,12 +44,13 @@ canvas.addEventListener("mouseup", (e) => {
 })
 
 let keyDown;
+let toggle = 1;
 
 function getKey(e) {
     // Update the last key pressed down
     keyDown = e.key;
-    // Remove the fact that the Arrow keys Up and Down move the scrol bar while using the menu's game
-    if (keyDown === 'ArrowUp' || keyDown === 'ArrowDown'){
+    // Remove the fact that the Arrow keys Up and Down, and Spacebar move the scrol bar while using the menu's game
+    if (keyDown === 'ArrowUp' || keyDown === 'ArrowDown' || keyDown === ' '){
         e.preventDefault();
     }
     /*
@@ -79,7 +80,8 @@ class Game {
         this.levelDifficulty = [0.025, 0.05, 0.15];
         this.index = 0;
         this.menuState = true;
-
+        this.playerName = "";
+        this.userType = [];
     }
 
     menu(ctx){
@@ -93,7 +95,6 @@ class Game {
         // - Score (All the scores will be saved there)
         // - Preference (size of element or type of rebound)
 
-        let guide = "Use arrows to move and enter to select";
         const yOffset =  130;
         const width = 600;
         const height = 100;
@@ -105,7 +106,7 @@ class Game {
         // Guide text
         ctx.font = "25px sans-serif";
         ctx.fillStyle = "white";
-        ctx.fillText(guide, 300, 25);
+        ctx.fillText("Use Arrows to move and Enter to select", 300, 25);
 
         class MenuItem {
             constructor(name, x, y) {
@@ -158,8 +159,6 @@ class Game {
         }else if (keyDown === 'Enter'){
             if (this.index >= 0 && this.index <= 2){
                 this.menuState = false;
-                this.init();
-                this.draw(ctx);
             }else{
                 this.showScore();
             }
@@ -171,8 +170,50 @@ class Game {
          */
     }
 
+    getPlayerName(ctx){
+        // Background
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, this.width, this.height);
+
+        // Guide text
+        ctx.font = "25px sans-serif";
+        ctx.fillStyle = "white";
+        ctx.fillText("Enter your pseudo (max 10 char.)", 300, 25);
+        ctx.fillText("When you are done. Press 'Enter'.", 300, 55);
+
+        // User input
+        const w = 250;
+        const h = 75;
+
+        if (keyDown.length === 1 && toggle){
+            this.userType.push(keyDown);
+            toggle = 0;
+        }else if (keyDown === 'Backspace' && toggle) {
+            if (this.userType.length !== 0) {
+                this.userType.pop();
+                toggle = 0;
+            }
+        }else if (keyDown === 0){
+            toggle = 1;
+        }
+
+        let name = "";
+        for (let i=0; i<this.userType.length; i++){
+            name += this.userType[i];
+        }
+        if (name === ""){
+            name = "...";
+        }
+        ctx.fillText(name, this.width/2 - w, 200 - h)
+
+        if (keyDown === 'Enter' && name !== "..."){
+            this.playerName = name;
+        }
+    }
+
     showScore(){
-        console.log("Showing score with name of player");
+        console.log("Showing score with names of players");
+        // The data will be stored in the local storage.
     }
 
     init() {
@@ -583,8 +624,10 @@ arkanoid = new Game(0, 0, canvas.width, canvas.height);
 
 // Game Loop
 draw = function () {
-    if (arkanoid.menuState){
+    if (arkanoid.menuState) {
         arkanoid.menu(ctx);
+    }else if (arkanoid.playerName === ""){
+        arkanoid.getPlayerName(ctx);
     }else if (!arkanoid.changeLevel){
         arkanoid.play(ctx);
     }else{
