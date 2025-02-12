@@ -16,6 +16,7 @@ watchKey.addEventListener("keyup", (e) => {
 // Link to high score
 const elHighScore = document.getElementById("high-score");
 
+/*
 let highScore = 0;
 // If a high score already exist
 if (localStorage.getItem("highScore") != null) {
@@ -24,9 +25,11 @@ if (localStorage.getItem("highScore") != null) {
     // Create a localStorage place to store next high scores
     localStorage.setItem("highScore", highScore);
 }
+*/
+//localStorage.clear()
 
 // Display it
-elHighScore.textContent = highScore;
+//elHighScore.textContent = highScore;
 
 // Link to current score
 const elCurrentScore = document.getElementById("current-score");
@@ -82,6 +85,8 @@ class Game {
         this.menuState = true;
         this.playerName = "";
         this.userType = [];
+        this.highScore = 0;
+        this.scoreState = false;
     }
 
     menu(ctx){
@@ -160,7 +165,8 @@ class Game {
             if (this.index >= 0 && this.index <= 2){
                 this.menuState = false;
             }else{
-                this.showScore();
+                this.scoreState = true;
+                this.showScore(ctx);
             }
         }
         keyDown = '';
@@ -177,6 +183,7 @@ class Game {
 
         // Guide text
         ctx.font = "25px sans-serif";
+        ctx.textAlign = "left";
         ctx.fillStyle = "white";
         ctx.fillText("Enter your pseudo (max 10 char.)", 300, 25);
         ctx.fillText("When you are done. Press 'Enter'.", 300, 55);
@@ -208,12 +215,59 @@ class Game {
 
         if (keyDown === 'Enter' && name !== "..."){
             this.playerName = name;
+            this.init();
+            this.draw(ctx);
+            this.getScores();
         }
     }
 
-    showScore(){
-        console.log("Showing score with names of players");
-        // The data will be stored in the local storage.
+    showScore(ctx){
+        // Background
+        ctx.fillStyle = "black";
+        ctx.fillRect(0, 0, this.width, this.height);
+
+        // Guide text
+        ctx.font = "25px sans-serif";
+        ctx.textAlign = "left";
+        ctx.fillStyle = "white";
+        ctx.fillText("Here you can see the players scores :", 200, 25);
+
+        let scores = JSON.parse(localStorage.getItem("scores"));
+        if (scores !== null){
+            ctx.textAlign = "center"
+            ctx.fillText("Player's name", 250, 60);
+            ctx.fillText("Player's score", 550, 60);
+
+            for (let i=0; i<scores.length;i++){
+                ctx.fillText(scores[i][0], 250, 85 + i * 25);
+                ctx.fillText(scores[i][1], 550, 85 + i * 25);
+            }
+        }else{
+            ctx.textAlign = "left";
+            ctx.fillText("No score has been stored at the moment", 200, 60);
+        }
+    }
+
+    getScores(){
+        let localScores = JSON.parse(localStorage.getItem("scores"));
+        if (localScores !== null){
+            this.highScore = localScores[0][1];
+        }else{
+            localStorage.setItem("scores", JSON.stringify([]));
+        }
+    }
+
+    setScores(){
+        let scores = JSON.parse(localStorage.getItem("scores"));
+        if (scores.find((name) => {return name[0] === this.playerName}) !== undefined){
+            let i = scores.findIndex((name) => {return name[0] === this.playerName});
+            if (scores[i][1] < this.playerScore){
+                scores[i][1] = this.playerScore;
+            }
+        }else{
+            scores.push([this.playerName, this.playerScore]);
+        }
+        localStorage.setItem("scores", JSON.stringify(scores));
     }
 
     init() {
@@ -320,6 +374,7 @@ class Game {
         // If the game is going to be over
         if (this.state === "over") {
             this.gameOver = true;
+            this.setScores();
             // If all the bricks are been removed
         } else if (this.bricks.length === 0) {
             // Display the change of level
@@ -376,6 +431,7 @@ class Game {
 
         // The text
         ctx.fillStyle = "white";
+        ctx.textAlign = "left";
         ctx.font = "70px serif";
         ctx.fillText("Well done ! Keep pushing !", this.width / 2 - 150, this.height / 2 + 150);
 
@@ -401,6 +457,7 @@ class Game {
 
         // The text write in white with shadow in red
         ctx.fillStyle = "white";
+        ctx.textAlign = "left";
         ctx.font = "100px sans-serif";
         ctx.lineWidth = 2;
         ctx.strokeText("GameOver", x + 50 - 5, y + 125);
@@ -424,6 +481,8 @@ class Game {
     }
 
     manageScore() {
+        
+        /*
         // if a new high score has been reached
         if (this.playerScore > highScore) {
             localStorage.setItem("highScore", this.playerScore);
@@ -433,6 +492,7 @@ class Game {
         // display the high score and the current score.
         elHighScore.textContent = highScore;
         elCurrentScore.textContent = this.playerScore;
+        */
     }
 }
 
@@ -625,7 +685,9 @@ arkanoid = new Game(0, 0, canvas.width, canvas.height);
 // Game Loop
 draw = function () {
     if (arkanoid.menuState) {
-        arkanoid.menu(ctx);
+        if (!arkanoid.scoreState){
+            arkanoid.menu(ctx);
+        }
     }else if (arkanoid.playerName === ""){
         arkanoid.getPlayerName(ctx);
     }else if (!arkanoid.changeLevel){
