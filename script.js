@@ -14,7 +14,7 @@ watchKey.addEventListener("keyup", (e) => {
 });
 
 // Link to high score
-const elHighScore = document.getElementById("high-score");
+const elHighScore    = document.getElementById("high-score");
 
 /*
 let highScore = 0;
@@ -55,6 +55,10 @@ function getKey(e) {
     // Remove the fact that the Arrow keys Up and Down, and Spacebar move the scrol bar while using the menu's game
     if (keyDown === 'ArrowUp' || keyDown === 'ArrowDown' || keyDown === ' '){
         e.preventDefault();
+    }
+    if (keyDown === 'Escape'){
+        arkanoid.scoreState = false;
+        arkanoid.menuState = true;
     }
     /*
     if (e.key === "r" && arkanoid.gameOver) {
