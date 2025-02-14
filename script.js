@@ -88,7 +88,7 @@ class Game {
         this.changeLevel = false;
         this.playerScore = 0;
         this.newHighScore = false;
-        this.levelDifficulty = [0.025, 0.05, 0.15];
+        this.levelDifficulty = [0.045, 0.08, 0.22];
         this.index = 0;
         this.menuState = true;
         this.playerName = "";
