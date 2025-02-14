@@ -14,7 +14,7 @@ watchKey.addEventListener("keyup", (e) => {
 });
 
 // Link to high score
-const elHighScore    = document.getElementById("high-score");
+//const elHighScore    = document.getElementById("high-score");
 
 /*
 let highScore = 0;
@@ -32,7 +32,7 @@ if (localStorage.getItem("highScore") != null) {
 //elHighScore.textContent = highScore;
 
 // Link to current score
-const elCurrentScore = document.getElementById("current-score");
+//const elCurrentScore = document.getElementById("current-score");
 
 // Catch all the mouseup event
 canvas.addEventListener("mouseup", (e) => {
@@ -59,6 +59,10 @@ function getKey(e) {
     if (keyDown === 'Escape'){
         arkanoid.scoreState = false;
         arkanoid.menuState = true;
+    }
+
+    if (keyDown === 'r' && arkanoid.gameOver){
+        arkanoid.restart(ctx);
     }
     /*
     if (e.key === "r" && arkanoid.gameOver) {
@@ -189,8 +193,9 @@ class Game {
         ctx.font = "25px sans-serif";
         ctx.textAlign = "left";
         ctx.fillStyle = "white";
-        ctx.fillText("Enter your pseudo (max 10 char.)", 300, 25);
-        ctx.fillText("When you are done. Press 'Enter'.", 300, 55);
+        ctx.fillText("Enter your pseudo. Press 'Enter' to continue.", 150, 25);
+        ctx.fillText("Press 'Escape' to go back.", 150, 60);
+        ctx.fillText("", 200, 55);
 
         // User input
         const w = 250;
@@ -231,20 +236,21 @@ class Game {
         ctx.fillRect(0, 0, this.width, this.height);
 
         // Guide text
-        ctx.font = "25px sans-serif";
-        ctx.textAlign = "left";
+        ctx.font = "35px sans-serif";
+        ctx.textAlign = "center";
         ctx.fillStyle = "white";
-        ctx.fillText("Here you can see the players scores :", 200, 25);
+        ctx.fillText("The Scores", this.width/2, 25);
 
         let scores = JSON.parse(localStorage.getItem("scores"));
         if (scores !== null){
+            ctx.font = "25px sans-serif";
             ctx.textAlign = "center"
-            ctx.fillText("Player's name", 250, 60);
-            ctx.fillText("Player's score", 550, 60);
+            ctx.fillText("Name", this.width/2 - 200, 70);
+            ctx.fillText("High score", this.width/2 + 200, 70);
 
             for (let i=0; i<scores.length;i++){
-                ctx.fillText(scores[i][0], 250, 85 + i * 25);
-                ctx.fillText(scores[i][1], 550, 85 + i * 25);
+                ctx.fillText(scores[i][0], this.width/2 - 200, 100 + i * 35);
+                ctx.fillText(scores[i][1], this.width/2 + 200, 100 + i * 35);
             }
         }else{
             ctx.textAlign = "left";
@@ -255,7 +261,9 @@ class Game {
     getScores(){
         let localScores = JSON.parse(localStorage.getItem("scores"));
         if (localScores !== null){
-            this.highScore = localScores[0][1];
+            if (localScores.length !== 0) {
+                this.highScore = localScores[0][1];
+            }
         }else{
             localStorage.setItem("scores", JSON.stringify([]));
         }
@@ -267,6 +275,7 @@ class Game {
             let i = scores.findIndex((name) => {return name[0] === this.playerName});
             if (scores[i][1] < this.playerScore){
                 scores[i][1] = this.playerScore;
+                this.newHighScore = true;
             }
         }else{
             scores.push([this.playerName, this.playerScore]);
@@ -392,8 +401,6 @@ class Game {
 
         // Move the stick in function of the key press, use the left wall for stopping before going into it.
         this.stick.move(this.walls[1]);
-
-        this.manageScore();
     }
 
     // Check collisions between ball and others objects
@@ -430,18 +437,22 @@ class Game {
         img.onload = function () {
             // drawImage(img, sx, sy, sWidth, sHeight, dx, dy, dWidth, dHeight)
             // s is for cutting the image and d is for placing the image in the canvas
-            ctx.drawImage(img, 10, 0, 243, 191, this.width / 2 + 10, this.height / 2 - 50, 263 * 2, 191 * 2);
+            ctx.drawImage(img, 10, 0, 243, 191, this.width / 2 + 50, this.height / 2 - 50, 263 * 2, 191 * 2);
         }
 
         // The text
         ctx.fillStyle = "white";
-        ctx.textAlign = "left";
+        ctx.textAlign = "center";
         ctx.font = "70px serif";
-        ctx.fillText("Well done ! Keep pushing !", this.width / 2 - 150, this.height / 2 + 150);
+        ctx.fillText("Well done ! Keep pushing !", this.width / 2, this.height / 2 + 150);
 
-        // text to restart the game
-        ctx.font = "20px sans-serif";
-        ctx.fillText("Press R to restart", 100, this.height - 50);
+        // Show score
+        // high score
+        ctx.font = "30px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("High score : " + this.highScore, this.width/2, this.height / 2 + 230);
+        // player score
+        ctx.fillText("Player score : " + this.playerScore, this.width/2, this.height / 2 + 280);
     }
 
     displayGameOver(ctx) {
@@ -467,36 +478,24 @@ class Game {
         ctx.strokeText("GameOver", x + 50 - 5, y + 125);
         ctx.fillText("GameOver", x + 50, y + 125);
 
+        // show score
+        // high score
+        // player score
+
         // text to restart the game
         ctx.font = "20px sans-serif";
         ctx.fillText("Press R to restart", 100, this.height - 50);
     }
 
-    restart(ctx) {
-        // Reset to the start of the game
+    restart() {
+        // Reset to the game menu
         this.gameOver = false;
         this.newHighScore = false;
-        this.gameStop = true;
         this.currentLevel = 1;
         this.playerScore = 0;
-        this.manageScore();
-        this.init(ctx);
-        this.draw(ctx);
-    }
-
-    manageScore() {
-        
-        /*
-        // if a new high score has been reached
-        if (this.playerScore > highScore) {
-            localStorage.setItem("highScore", this.playerScore);
-            highScore = this.playerScore;
-            this.newHighScore = true;
-        }
-        // display the high score and the current score.
-        elHighScore.textContent = highScore;
-        elCurrentScore.textContent = this.playerScore;
-        */
+        this.playerName = ""
+        this.menuState = true;
+        draw();
     }
 }
 
@@ -722,5 +721,4 @@ draw = function () {
         }
     }
 }
-
 draw();
