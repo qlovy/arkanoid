@@ -12,7 +12,6 @@ watchKey.addEventListener("keydown", getKey);
 watchKey.addEventListener("keyup", (e) => {
     keyDown = 0;    // Reset when the key is up
 });
-
 // Link to high score
 //const elHighScore    = document.getElementById("high-score");
 
@@ -89,6 +88,7 @@ class Game {
         this.playerScore = 0;
         this.newHighScore = false;
         this.levelDifficulty = [0.045, 0.08, 0.22];
+        this.levelName = ["Easy", "Medium", "Hard"];
         this.index = 0;
         this.menuState = true;
         this.playerName = "";
@@ -178,6 +178,7 @@ class Game {
             }
         }
         keyDown = '';
+        this.userType = [];
         /*
         If level of difficulty is selected, launch the game with their settings
         If scores is selected, display an array with all the previous score and the name
@@ -246,23 +247,30 @@ class Game {
             ctx.font = "25px sans-serif";
             ctx.textAlign = "center"
             ctx.fillText("Name", this.width/2 - 200, 70);
-            ctx.fillText("High score", this.width/2 + 200, 70);
-
+            ctx.fillText("High score", this.width/2, 70);
+            ctx.fillText("Difficulty", this.width/2 + 200, 70);
             for (let i=0; i<scores.length;i++){
                 ctx.fillText(scores[i][0], this.width/2 - 200, 100 + i * 35);
-                ctx.fillText(scores[i][1], this.width/2 + 200, 100 + i * 35);
+                ctx.fillText(scores[i][1], this.width/2, 100 + i * 35);
+                ctx.fillText(scores[i][2], this.width/2 + 200, 100 + i * 35);
             }
         }else{
-            ctx.textAlign = "left";
-            ctx.fillText("No score has been stored at the moment", 200, 60);
+            ctx.textAlign = "center";
+            ctx.font = "25px sans-serif"
+            ctx.fillText("No score has been stored at the moment.", this.width/2, 80);
         }
     }
 
+    checkScore(item){
+        return item[0] === this.playerName && item[2] === this.levelName[this.index];
+    }
+
     getScores(){
-        let localScores = JSON.parse(localStorage.getItem("scores"));
-        if (localScores !== null){
-            if (localScores.length !== 0) {
-                this.highScore = localScores[0][1];
+        let scores = JSON.parse(localStorage.getItem("scores"));
+        if (scores !== null){
+            if (scores.find(this.checkScore.bind(this)) !== undefined){
+                let i = scores.findIndex(this.checkScore.bind(this));
+                this.highScore = scores[i][1];
             }
         }else{
             localStorage.setItem("scores", JSON.stringify([]));
@@ -271,14 +279,14 @@ class Game {
 
     setScores(){
         let scores = JSON.parse(localStorage.getItem("scores"));
-        if (scores.find((name) => {return name[0] === this.playerName}) !== undefined){
-            let i = scores.findIndex((name) => {return name[0] === this.playerName});
+        if (scores.find(this.checkScore.bind(this)) !== undefined){
+            let i = scores.findIndex(this.checkScore.bind(this));
             if (scores[i][1] < this.playerScore){
                 scores[i][1] = this.playerScore;
                 this.newHighScore = true;
             }
         }else{
-            scores.push([this.playerName, this.playerScore]);
+            scores.push([this.playerName, this.playerScore, this.levelName[this.index]]);
         }
         localStorage.setItem("scores", JSON.stringify(scores));
     }
@@ -478,9 +486,13 @@ class Game {
         ctx.strokeText("GameOver", x + 50 - 5, y + 125);
         ctx.fillText("GameOver", x + 50, y + 125);
 
-        // show score
+        // Show score
         // high score
+        ctx.font = "30px sans-serif";
+        ctx.textAlign = "center";
+        ctx.fillText("High score : " + this.highScore, this.width/2, this.height / 2 + 150);
         // player score
+        ctx.fillText("Player score : " + this.playerScore, this.width/2, this.height / 2 + 200);
 
         // text to restart the game
         ctx.font = "20px sans-serif";
@@ -721,4 +733,5 @@ draw = function () {
         }
     }
 }
-draw();
+arkanoid.displayGameOver(ctx);
+//draw();
