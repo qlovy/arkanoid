@@ -733,5 +733,4 @@ draw = function () {
         }
     }
 }
-arkanoid.displayGameOver(ctx);
-//draw();
+draw();
